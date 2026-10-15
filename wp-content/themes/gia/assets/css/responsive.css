@@ -1,0 +1,196 @@
+@media screen and (max-width:1260px) {
+    .cus-carousel .owl-nav .owl-prev,
+    .cus-carousel .owl-nav .owl-next{
+        padding: 5px 12px !important;
+    }
+    .cus-carousel .owl-nav .owl-prev {
+        left: 0;
+    }
+    .cus-carousel .owl-nav .owl-next {
+        right: 0;
+    }
+    /*** #menu-hash ***/
+    .tf-carousel-box .owl-carousel .owl-prev {
+        left: 0 !important;
+    }
+    .tf-carousel-box .owl-carousel .owl-next {
+        right: 0 !important;
+    }
+    /***carousel-media ****/
+    .elementor-swiper-button-prev,
+    .elementor-swiper-button-next{
+        background: #DA1025;
+        padding: 9px 10px;
+    }
+    .elementor-swiper-button-prev{
+        left: 0px !important;
+    }
+    .elementor-swiper-button-next{
+        right: 0px !important;
+    }
+}
+
+@media screen and (max-width:1024px) {    
+    .topmenu{
+        display: none !important;
+    }
+    #footer-menu ul > li > a{
+        border-right: none;
+    }
+    .news-page {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
+    .banner-top{
+        min-height: 120px;
+    }
+    #breadcrumbs, #breadcrumbs a, #breadcrumbs a:hover{
+        padding-bottom: 10px;
+    }
+    
+    /*** #menu-hash ***/
+    #menu-hash.elementor-sticky--active{
+        top: 100px !important;
+    }
+    #menu-hash ul li{
+        width: 100%;
+    }
+    #menu-hash ul li a {
+        width: 100%;
+    }
+    #menu-hash ul.hideList li a{
+        display: none;
+    }
+    #menu-hash ul.hideList li a.active {
+        display: block;
+    }
+    #menu-hash .elementor-widget-container{
+        position: relative;
+    }
+    #menu-hash .elementor-widget-container .menu-toggle{
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 1;
+        width: 40px;
+        padding: 10px;
+    }
+    #menu-hash .elementor-widget-container .menu-toggle::after{
+        content: "\f078";
+        font-family: 'Font Awesome 5 Pro';
+        font-weight: 900;
+        color: #92C9AC;
+    }
+    /*** #register Event ***/
+    #registerModal .wpcf7{
+        padding: 0;
+    }    
+}
+
+@media screen and (max-width:992px) {
+    .elementor-element:hover > .elementor-element-populated > .elementor-background-overlay{
+        opacity: 0.4 !important;
+    }
+    .searchform .bootstrap-select {
+        margin-bottom: 10px;
+    }
+    .elementor-element .eael-advance-tabs .eael-tabs-nav > ul li {
+        font-size: 16px !important;
+        line-height: 23px !important;
+        padding: 7px !important;
+        margin: 0px 5px 5px 5px !important;
+    }
+    .cus-tabs .cuslink {
+        font-size: 24px;
+        padding-right: 20px;
+    }
+    /*** #product-thumb ***/
+    .product .product-thumb {
+        padding-left: 0;
+        padding-right: 0;
+        position: relative;
+    }
+    .tab-content{
+        padding: 0;
+    }
+    .cus-modal .wpcf7{
+        padding: 0;
+    }
+    /*** #tabmenus ***/
+    .tabmenus li{
+        width: 250px;
+        padding: 10px 10px;
+    }
+}
+
+@media screen and (max-width:767px) {
+    .downloads-list{
+        padding-left: 30px;
+    }
+    div.product-campaign{
+            flex-wrap: wrap;
+    }
+    div.product-campaign .product-image {
+        margin-right: 0;
+    }
+    .product-campaign .product-image, .product-campaign .product-meta{
+        flex: 0 100%!important
+    }
+    
+    /***tab-scrollbar ****/
+    .tab-scrollbar .eael-tabs-nav{
+        overflow-x: unset;
+    }
+    .tab-scrollbar .eael-tab-inline-icon{
+        width: 100%;
+        margin-bottom: 0 !important;
+    }
+    /*** #tabmenus ***/
+    .tabmenus li{
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}
+
+@media screen and (max-width:576px) {
+    /*** #menu-hash ***/
+    #menu-hash.elementor-sticky--active{
+        top: 55px !important;
+    }
+    .featured-box .boxImage{
+        height: 210px;
+    }
+    /*** #product-thumb ***/
+    .product .product-tabs li a{
+        padding: 5px 10px;
+        font-size: 12px;
+        margin-bottom: 5px;
+    }
+    .search-box-mb input[type="search"] {
+        width: 150px;
+    }
+    /*****map****/
+    .store-locator-top-half{
+        height: 350px !important;
+    }
+    .store-locator-map {
+        height: 350px !important;
+        top: 0 !important;
+    }
+}
+
+@media (max-width:360px) {
+    .featured-box .boxImage{
+        height: 180px;
+    }
+    /*** #product-thumb ***/
+    .product .product-tabs li a{
+        padding: 5px;
+        font-size: 9px;
+    }
+}
+@media (min-width: 1200px) {
+   .modal-xlg { 
+      max-width: 970px; 
+   }
+}

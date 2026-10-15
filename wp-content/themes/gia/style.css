@@ -1,0 +1,158 @@
+/*
+Theme Name: GIA
+Text Domain: gia
+Theme URI: https://wordpress.org/themes/gia/
+Author: the WordPress team
+Author URI: https://wordpress.org
+Description: GIA is a modern, responsive theme designed for flexibility and ease of use. It offers a clean layout with customizable options, making it perfect for personal blogs, business websites, and creative portfolios. The theme supports a variety of page templates and includes built-in support for popular plugins.
+Requires at least: 6.7
+Tested up to: 7.1
+Requires PHP: 7.2
+Version: 1.5
+License: GNU General Public License v2 or later
+License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, block-patterns, rtl-language-support, sticky-post, threaded-comments, translation-ready, wide-blocks, block-styles, style-variations, accessibility-ready, blog, portfolio, news
+*/
+
+/*--------------------------------------------------------------
+>>> CSS Reset:
+----------------------------------------------------------------*/
+body {
+  font-family: "Noto Sans JP", Sans-serif;
+  font-size: 16px;
+  line-height: 28px;
+  color: #231815;
+  background-color: #fafafa;
+}
+body.wpml-lang-vi {
+  font-family: "Roboto Condensed";
+}
+/*h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+address,
+big,
+cite,
+code,
+em,
+font,
+img,
+small,
+strike,
+sub,
+sup,
+fieldset,
+form,
+label,
+legend,
+button,
+table,
+caption,
+tr,
+th,
+td {
+	border: none;
+	font-size: inherit;
+	line-height: inherit;
+	margin: 0;
+	padding: 0;
+	text-align: inherit;
+}*/
+
+blockquote::before,
+blockquote::after {
+  content: "";
+}
+
+p {
+  line-height: 26px;
+  margin: 0 0 16px 0 !important;
+  letter-spacing: 1px;
+}
+
+em,
+i,
+q,
+dfn {
+  font-style: italic;
+}
+
+em em,
+em i,
+i em,
+i i,
+cite em,
+cite i {
+  font-weight: bolder;
+}
+
+big {
+  font-size: 1.2em;
+}
+
+small {
+  font-size: 0.75em;
+}
+
+b,
+strong {
+  font-weight: 700;
+}
+
+ins {
+  text-decoration: underline;
+}
+
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+
+sup {
+  top: -0.5em;
+}
+
+sub {
+  bottom: -0.25em;
+}
+
+abbr,
+acronym {
+  cursor: help;
+}
+
+address {
+  line-height: 1.5;
+  margin: 0 0 2rem 0;
+}
+
+hr {
+  border-style: solid;
+  border-width: 0.1rem 0 0 0;
+  border-color: #dcd7ca;
+  margin: 4rem 0;
+}
+a:hover,
+a:focus {
+  text-decoration: none;
+}
+.error404 #site-content {
+  padding-top: 4rem;
+}
+
+.error404-content {
+  text-align: center;
+}
+
+.error404 #site-content .search-form {
+  justify-content: center;
+  margin-top: 3rem;
+}

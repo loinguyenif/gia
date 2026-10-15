@@ -1,0 +1,100 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: "
+"atap\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: atap\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/"
+"plain; charset=UTF-8\n"
+"Content-Transfer-"
+"Encoding: 8bit\n"
+"Language: th_TH\n"
+"X-Generator: Poedit "
+"2.4.2\n"
+"X-Poedit-SourceCharset: "
+"UTF-8\n"
+"X-Poedit-KeywordsList: "
+"__\n"
+"X-Poedit-Basepath: .\n"
+"Plural-Forms: "
+"nplurals=1; plural=0;\n"
+"X-Poedit-"
+"SearchPath-0: .\n"
+
+msgid "Home"
+msgstr "บ้าน"
+
+msgid "Learn More"
+msgstr "เรียนรู้เพิ่มเติม"
+
+msgid "Sort By:"
+msgstr "เรียงตาม:"
+
+msgid "Latest Date"
+msgstr "วันที่ล่าสุด"
+
+msgid "Title"
+msgstr "หัวข้อ"
+
+msgid "Select Type"
+msgstr "เลือกประเภท"
+
+msgid "Enter keywords…"
+msgstr "ป้อนคำหลัก ..."
+
+msgid "Read More"
+msgstr "อ่านเพิ่มเติม"
+
+msgid "Oldest Date"
+msgstr "วันที่เก่าที่สุด"
+
+msgid "Download PDF"
+msgstr "ดาวน์โหลด PDF"
+
+msgid "Event & Training"
+msgstr "กิจกรรมและการฝึกอบรม"
+
+msgid "On – Demand"
+msgstr "ตามความต้องการ"
+
+msgid "Upcoming"
+msgstr "กำลังจะเกิดขึ้น"
+
+msgid "Continue reading"
+msgstr "อ่านต่อไป"
+
+msgid "Coming Soon"
+msgstr "เร็ว ๆ นี้"
+
+msgid "Campaign"
+msgstr "แคมเปญ"
+
+msgid "Products"
+msgstr "ผลิตภัณฑ์"
+
+msgid "Updated On"
+msgstr "อัปเดตเมื่อ"
+
+msgid "View Details"
+msgstr "ดูรายละเอียด"
+
+msgid "Back"
+msgstr "กลับ"
+
+msgid "Share"
+msgstr "แบ่งปัน"
+
+msgid "Watch"
+msgstr "ดู"
+
+msgid "Price List"
+msgstr "ราคา"
+
+msgid "Discontinued Product"
+msgstr "ผลิตภัณฑ์ที่เลิกผลิต"
+
+msgid "Resources"
+msgstr "ทรัพยากร"
