@@ -28,7 +28,7 @@ if(isset($_GET['series']) && $_GET['series']){
 }
 ?>
 
-<div class="banner-top" style="background: #2E4B89 url('http://appdev.ifdemo.com/atap/wp-content/uploads/2020/11/banner-top-product.png');">
+<div class="banner-top" style="background: #2E4B89 url('http://appdev.ifdemo.com/gia/wp-content/uploads/2020/11/banner-top-product.png');">
     <div class="container">
         <?php echo apat_breadcrumbs(); ?>
         <h2 class="page-title"><?php echo get_the_title(); ?></h2>
@@ -39,18 +39,18 @@ if(isset($_GET['series']) && $_GET['series']){
     <div class="container">
         <div class="row searchform">
         	<div class="col-md-1">
-                <label class="control"><?php echo __('Sort By:', 'atap' );?></label>
+                <label class="control"><?php echo __('Sort By:', 'gia' );?></label>
             </div>
          	<div class="col-md-2">
 	            <select name="orderby" id="lastest" class="control selectpicker">
-	                <option disabled selected><?php echo __('Select Type', 'atap' );?></option>
-	               	<option value="date_desc"><?php echo __('Latest Date', 'atap' );?></option>
-	               	<option value="date_asc"><?php echo __('Oldest Date', 'atap' );?></option>
+	                <option disabled selected><?php echo __('Select Type', 'gia' );?></option>
+	               	<option value="date_desc"><?php echo __('Latest Date', 'gia' );?></option>
+	               	<option value="date_asc"><?php echo __('Oldest Date', 'gia' );?></option>
 	            </select>
 	        </div>
 	        <div class="col-md-5"></div>
             <div class="col-md-4 search-box">
-                <input type="search" id="search" class="search-field" placeholder="<?php echo __('Enter keywords…', 'atap' );?>" value="<?php echo esc_attr( get_search_query() ); ?>" name="s"/>
+                <input type="search" id="search" class="search-field" placeholder="<?php echo __('Enter keywords…', 'gia' );?>" value="<?php echo esc_attr( get_search_query() ); ?>" name="s"/>
                 <button type="submit" class="s"  value="<?php the_search_query(); ?>" ><i class="fas fa-search"></i></button>	
         	</div>
         </div>
@@ -158,7 +158,7 @@ if(isset($_GET['series']) && $_GET['series']){
         	</div>
         	<div class="col-md-9 product-list pl-lg-5">
         		<!-- <div class="iconload col-12">
-        			<img src="http://localhost/atap/wp-content/uploads/loader.gif">
+        			<img src="http://localhost/gia/wp-content/uploads/loader.gif">
         		</div> -->
         		<div class="row pl-lg-4 ">
 					

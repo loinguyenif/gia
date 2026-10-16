@@ -1,7 +1,7 @@
 <?php get_header(); ?>
 
 
-<div class="banner-top" style="background: #2E4B89 url('http://appdev.ifdemo.com/atap/wp-content/uploads/2020/10/banner_news.jpg');">
+<div class="banner-top" style="background: #2E4B89 url('http://appdev.ifdemo.com/gia/wp-content/uploads/2020/10/banner_news.jpg');">
     <div class="container">
         <ul id="breadcrumbs">
         	<a href="<?php echo get_bloginfo('url')?>">Home</a> <span class="delimiter"> &nbsp; / &nbsp; </span> <span class="current">Search results</span>

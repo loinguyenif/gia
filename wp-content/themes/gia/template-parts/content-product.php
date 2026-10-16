@@ -2,7 +2,7 @@
 	<div class="product-image">
 		<a href="<?php the_permalink();?>">
 			<!-- <img src="<?php echo get_the_post_thumbnail_url();?>"> -->
-			<img src="http://appdev.ifdemo.com/atap/wp-content/uploads/2020/10/EnterpriseCampus.png">
+			<img src="http://appdev.ifdemo.com/gia/wp-content/uploads/2020/10/EnterpriseCampus.png">
 			<?php 
 				$key=0;
 				$term_list = get_the_terms($post->ID, 'product-cat');

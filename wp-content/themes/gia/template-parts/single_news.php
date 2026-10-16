@@ -9,7 +9,7 @@ get_header();
         
             <header class="single-header">
                 <div class="back">
-                    <a href="javascript:history.back()" class="btn-back"><i class="fal fa-arrow-left"></i> &nbsp <?php echo __('Back', 'atap' );?></a>
+                    <a href="javascript:history.back()" class="btn-back"><i class="fal fa-arrow-left"></i> &nbsp <?php echo __('Back', 'gia' );?></a>
                 </div>
             </header>
             <div class="article-top">                     
@@ -29,7 +29,7 @@ get_header();
             
             
             <ul class="social-share">
-                <li><a><?php echo __('Share:', 'atap' );?> </a></li>
+                <li><a><?php echo __('Share:', 'gia' );?> </a></li>
                 <li>
                     <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=<?php the_permalink(); ?>">
                         <i class="fab fa-facebook-f"></i>
@@ -49,7 +49,7 @@ get_header();
             
             <div class="post-inner">
                 <div class="entry-content">
-                    <?php the_content( __( 'Continue reading', 'atap' ) );?>
+                    <?php the_content( __( 'Continue reading', 'gia' ) );?>
                 </div><!-- .entry-content -->
             </div><!-- .post-inner -->
         

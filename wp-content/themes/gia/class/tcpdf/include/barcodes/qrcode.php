@@ -861,19 +861,19 @@ class QRcode {
 		$el = $this->rsEccCodes1($spec);
 		$rs = $this->init_rs(8, 0x11d, 0, 1, $el, 255 - $dl - $el);
 		$blockNo = 0;
-		$dataPos = 0;
+		$dgiaos = 0;
 		$eccPos = 0;
 		$endfor = $this->rsBlockNum1($spec);
 		for ($i=0; $i < $endfor; ++$i) {
 			$ecc = array_slice($this->ecccode, $eccPos);
 			$this->rsblocks[$blockNo] = array();
 			$this->rsblocks[$blockNo]['dataLength'] = $dl;
-			$this->rsblocks[$blockNo]['data'] = array_slice($this->datacode, $dataPos);
+			$this->rsblocks[$blockNo]['data'] = array_slice($this->datacode, $dgiaos);
 			$this->rsblocks[$blockNo]['eccLength'] = $el;
 			$ecc = $this->encode_rs_char($rs, $this->rsblocks[$blockNo]['data'], $ecc);
 			$this->rsblocks[$blockNo]['ecc'] = $ecc;
 			$this->ecccode = array_merge(array_slice($this->ecccode,0, $eccPos), $ecc);
-			$dataPos += $dl;
+			$dgiaos += $dl;
 			$eccPos += $el;
 			$blockNo++;
 		}
@@ -891,12 +891,12 @@ class QRcode {
 			$ecc = array_slice($this->ecccode, $eccPos);
 			$this->rsblocks[$blockNo] = array();
 			$this->rsblocks[$blockNo]['dataLength'] = $dl;
-			$this->rsblocks[$blockNo]['data'] = array_slice($this->datacode, $dataPos);
+			$this->rsblocks[$blockNo]['data'] = array_slice($this->datacode, $dgiaos);
 			$this->rsblocks[$blockNo]['eccLength'] = $el;
 			$ecc = $this->encode_rs_char($rs, $this->rsblocks[$blockNo]['data'], $ecc);
 			$this->rsblocks[$blockNo]['ecc'] = $ecc;
 			$this->ecccode = array_merge(array_slice($this->ecccode, 0, $eccPos), $ecc);
-			$dataPos += $dl;
+			$dgiaos += $dl;
 			$eccPos += $el;
 			$blockNo++;
 		}

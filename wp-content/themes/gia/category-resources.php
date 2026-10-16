@@ -35,12 +35,12 @@ $curent_id = get_query_var('cat');
                         
         <form role="search" method="post" class="searchform" action="<?php echo home_url( $wp->request ); ?>">
             <div class="row">
-                <div class="col-md-1"><label class="control"><?php echo __('Sort By:', 'atap' )?></label></div>
+                <div class="col-md-1"><label class="control"><?php echo __('Sort By:', 'gia' )?></label></div>
 
                 <div class="col-md-2">
                     <select name="orderby" id="lastest" class="control selectpicker">
-                        <option value="date_desc" <?php if($_POST['orderby'] == 'date_desc') echo 'selected' ?>><?php echo __('Latest Date, 'atap' )?></option>
-                        <option value="title_asc" <?php if($_POST['orderby'] == 'title_asc') echo 'selected' ?>><?php echo __('Title, 'atap' )?></option>
+                        <option value="date_desc" <?php if($_POST['orderby'] == 'date_desc') echo 'selected' ?>><?php echo __('Latest Date, 'gia' )?></option>
+                        <option value="title_asc" <?php if($_POST['orderby'] == 'title_asc') echo 'selected' ?>><?php echo __('Title, 'gia' )?></option>
                     </select>
                 </div>
                 
@@ -51,7 +51,7 @@ $curent_id = get_query_var('cat');
                     if($categories){    
                     ?>
                     <select name="subcat" id="topics" class="control selectpicker">
-                        <option value=""><?php echo __('Select Type', 'atap' )?></option>
+                        <option value=""><?php echo __('Select Type', 'gia' )?></option>
                         <?php foreach($categories as $category) {?>
                         <option value="<?php echo $category->term_id  ?>" <?php if($_POST['subcat'] == $category->term_id ) echo 'selected' ?>><?php echo $category->name ?></option>
                         <?php } ?>
@@ -61,7 +61,7 @@ $curent_id = get_query_var('cat');
                 
                 <div class="col-md-3"></div>
                 <div class="search-box col-md-4">
-                    <input type="search" class="search-field" placeholder="<?php echo __('Enter keywords…', 'atap' )?>" value="<?php echo esc_attr( get_search_query() ); ?>" name="s"/>
+                    <input type="search" class="search-field" placeholder="<?php echo __('Enter keywords…', 'gia' )?>" value="<?php echo esc_attr( get_search_query() ); ?>" name="s"/>
                     <button type="submit" class="s"  value="<?php the_search_query(); ?>" ><i class="fas fa-search"></i></button>
                 </div>
             </div>
@@ -140,7 +140,7 @@ $curent_id = get_query_var('cat');
         <?php if($loop->max_num_pages > 1):?>
         <div class="bottom-more">
             <div class="iconload"><img src="<?php echo site_url()?>/wp-content/uploads/loader.gif"/></div>
-            <div class="btn" id="more_posts"><?php echo __('Load More', 'atap' )?></div>
+            <div class="btn" id="more_posts"><?php echo __('Load More', 'gia' )?></div>
         </div>
         <?php endif;?>
     </div>

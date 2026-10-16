@@ -10,7 +10,7 @@ if(isset($_GET['cate']) && $_GET['cate']){
 $categorie = get_term_by('id', $cate, 'product-cat' );
 ?>
 
-<div class="banner-product" style="background-image: url('http://appdev.ifdemo.com/atap/wp-content/uploads/banner-product.jpg');">
+<div class="banner-product" style="background-image: url('http://appdev.ifdemo.com/gia/wp-content/uploads/banner-product.jpg');">
     <div class="container">
         <h1><?php echo $categorie->name; ?></h1>
         <p>Managed switches to help build the network you need to meet the demands of high performance, reliability and security, combined with a low cost of ownership.</p>
@@ -21,18 +21,18 @@ $categorie = get_term_by('id', $cate, 'product-cat' );
     <div class="container">
         <div class="row searchform">
         	<div class="col-md-1">
-                <label class="control"><?php echo __('Sort By:', 'atap' )?></label>
+                <label class="control"><?php echo __('Sort By:', 'gia' )?></label>
             </div>
          	<div class="col-md-2">
 	            <select name="orderby" id="lastest" class="control selectpicker">
-	                <option disabled selected><?php echo __('Select Type', 'atap' )?></option>
-	               	<option value="date_desc"><?php echo __('Latest Date', 'atap' )?></option>
-	               	<option value="date_asc"><?php echo __('Oldest Date', 'atap' )?></option>
+	                <option disabled selected><?php echo __('Select Type', 'gia' )?></option>
+	               	<option value="date_desc"><?php echo __('Latest Date', 'gia' )?></option>
+	               	<option value="date_asc"><?php echo __('Oldest Date', 'gia' )?></option>
 	            </select>
 	        </div>
 	        <div class="col-md-5"></div>
             <div class="col-md-4 search-box">
-                <input type="search" id="search" class="search-field" placeholder="<?php echo __('Enter keywords…', 'atap' )?>" value="<?php echo esc_attr( get_search_query() ); ?>" name="s"/>
+                <input type="search" id="search" class="search-field" placeholder="<?php echo __('Enter keywords…', 'gia' )?>" value="<?php echo esc_attr( get_search_query() ); ?>" name="s"/>
                 <button type="submit" class="s"  value="<?php the_search_query(); ?>" ><i class="fas fa-search"></i></button>	
         	</div>
         </div>
@@ -40,14 +40,14 @@ $categorie = get_term_by('id', $cate, 'product-cat' );
         <div class="row">
         	<div class="col-md-12 product-list">
         		<!-- <div class="iconload col-12">
-        			<img src="http://localhost/atap/wp-content/uploads/loader.gif">
+        			<img src="http://localhost/gia/wp-content/uploads/loader.gif">
         		</div> -->
         		<div class="row">
 					
 				</div>
 				<div class="button-more position-relative text-center">
 		            <div class="iconload"><img src="<?php echo site_url()?>/wp-content/uploads/loader.gif"/></div>
-		            <div class="btn" id="more_posts"><?php echo __('Load More', 'atap' )?></div>
+		            <div class="btn" id="more_posts"><?php echo __('Load More', 'gia' )?></div>
 				</div>
 			</div>
         </div>

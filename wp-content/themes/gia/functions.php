@@ -6,14 +6,6 @@ define('THEME_URL', get_template_directory_uri());
 define('CHILD_THEME_URL', get_stylesheet_directory_uri());
 add_filter('use_block_editor_for_post', '__return_false', 10);
 
-function wpml_add_classes($classes) {
-    global $sitepress;
-    if( is_a($sitepress, 'SitePress') && method_exists( $sitepress, 'get_current_language' ) ) {
-        $classes[] = 'wpml-lang-'.$sitepress->get_current_language();
-    }
-    return $classes;
-}
-add_action('body_class', 'wpml_add_classes');
 /**
  * REQUIRED FILES
  */
@@ -23,7 +15,7 @@ require get_template_directory() . '/inc/post-types.php';
 /**
  * Sets up theme defaults and registers support for various WordPress features.
  */
-function atap_theme_support() {
+function gia_theme_support() {
 
     // Add default posts and comments RSS feed links to head.
     add_theme_support( 'automatic-feed-links' );
@@ -69,12 +61,8 @@ function atap_theme_support() {
     //Let WordPress manage the document title.
     // add_theme_support( 'title-tag' );
 
-    //ake theme available for translation.
-    $language_folder = get_template_directory() . '/languages';
-    load_theme_textdomain( 'atap', $language_folder );
-
 }
-add_action( 'after_setup_theme', 'atap_theme_support' );
+add_action( 'after_setup_theme', 'gia_theme_support' );
 
 function meta_tags() {
      ?>
@@ -93,9 +81,10 @@ add_action( 'wp_head', 'meta_tags', 1);
 /**
  * Register and Enqueue Styles.
  */
-function atap_register_styles() {
+function gia_register_styles() {
 
     $theme_version = wp_get_theme()->get( 'Version' );
+    wp_enqueue_style( 'font-DINOT-css', THEME_URL . '/assets/webfonts/font-DINOT.css', array(), $theme_version );
     wp_enqueue_style( 'bootstrap-css', THEME_URL . '/assets/css/bootstrap.css', array(), $theme_version );
     wp_enqueue_style( 'bootstrap-select-css', THEME_URL . '/assets/css/bootstrap-select.min.css', array(), $theme_version );
     wp_enqueue_style( 'carousel-css', THEME_URL . '/assets/css/owl.carousel.css', array(), $theme_version );
@@ -104,13 +93,13 @@ function atap_register_styles() {
     wp_enqueue_style( 'custom-css', THEME_URL . '/assets/css/custom.css', array());
     wp_enqueue_style( 'responsive-css', THEME_URL . '/assets/css/responsive.css', array());
 }
-add_action( 'wp_enqueue_scripts', 'atap_register_styles' );
+add_action( 'wp_enqueue_scripts', 'gia_register_styles' );
 
 
 /**
  * Register and Enqueue Scripts.
  */
-function atap_register_scripts() {
+function gia_register_scripts() {
 
     $theme_version = wp_get_theme()->get( 'Version' );
     wp_enqueue_script( 'jquery-js', THEME_URL . '/assets/js/jquery.min.js', array(), $theme_version );
@@ -123,25 +112,25 @@ function atap_register_scripts() {
     wp_script_add_data( 'async-js', 'async', true );
 
 }
-add_action( 'wp_enqueue_scripts', 'atap_register_scripts' );
+add_action( 'wp_enqueue_scripts', 'gia_register_scripts' );
 
 
 /**
  * Register navigation menus uses wp_nav_menu in five places.
  */
-function atap_menus() {
+function gia_menus() {
 
     $locations = array(
-        'primary'  => __( 'Desktop Top Menu', 'atap' ),
-        'expanded' => __( 'Desktop Main Menu', 'atap' ),
-        'mobile'   => __( 'Mobile Menu', 'atap' ),
-        'footer'   => __( 'Footer Menu', 'atap' ),
-        'social'   => __( 'Social Menu', 'atap' ),
+        'primary'  => __( 'Desktop Top Menu', 'gia' ),
+        'expanded' => __( 'Desktop Main Menu', 'gia' ),
+        'mobile'   => __( 'Mobile Menu', 'gia' ),
+        'footer'   => __( 'Footer Menu', 'gia' ),
+        'social'   => __( 'Social Menu', 'gia' ),
     );
 
     register_nav_menus( $locations );
 }
-add_action( 'init', 'atap_menus' );
+add_action( 'init', 'gia_menus' );
 
 
 /**
@@ -150,7 +139,7 @@ add_action( 'init', 'atap_menus' );
  * @param string $html The HTML output from get_custom_logo (core function).
  * @return string
  */
-function atap_get_custom_logo( $html ) {
+function gia_get_custom_logo( $html ) {
 
     $logo_id = get_theme_mod( 'custom_logo' );
 
@@ -197,14 +186,14 @@ function atap_get_custom_logo( $html ) {
     return $html;
 
 }
-add_filter( 'get_custom_logo', 'atap_get_custom_logo' );
+add_filter( 'get_custom_logo', 'gia_get_custom_logo' );
 
 /**
  * Register widget areas.
  *
  * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
  */
-function atap_sidebar_registration() {
+function gia_sidebar_registration() {
 
 	// Arguments used in all register_sidebar() calls.
 	$shared_args = array(
@@ -219,9 +208,9 @@ function atap_sidebar_registration() {
 		array_merge(
 			$shared_args,
 			array(
-				'name'        => __( 'Footer #1', 'atap' ),
+				'name'        => __( 'Footer #1', 'gia' ),
 				'id'          => 'sidebar-1',
-				'description' => __( 'Widgets in this area will be displayed in the first column in the footer.', 'atap' ),
+				'description' => __( 'Widgets in this area will be displayed in the first column in the footer.', 'gia' ),
 			)
 		)
 	);
@@ -231,37 +220,27 @@ function atap_sidebar_registration() {
 		array_merge(
 			$shared_args,
 			array(
-				'name'        => __( 'Footer #2', 'atap' ),
+				'name'        => __( 'Footer #2', 'gia' ),
 				'id'          => 'sidebar-2',
-				'description' => __( 'Widgets in this area will be displayed in the second column in the footer.', 'atap' ),
+				'description' => __( 'Widgets in this area will be displayed in the second column in the footer.', 'gia' ),
 			)
 		)
 	);
     
-    register_sidebar(
-		array_merge(
-			$shared_args,
-			array(
-				'name'        => __( 'Language Switcher', 'atap' ),
-				'id'          => 'sidebar-3',
-				'description' => __( 'Language Switcher', 'atap' ),
-			)
-		)
-	);
 }
 
-add_action( 'widgets_init', 'atap_sidebar_registration' );
+add_action( 'widgets_init', 'gia_sidebar_registration' );
 
 
 /**
  * Overwrite default more tag with styling and screen reader markup.
  */
-function atap_read_more_tag( $html ) {
+function gia_read_more_tag( $html ) {
     return preg_replace( '/<a(.*)>(.*)<\/a>/iU', sprintf( '<div class="read-more-button-wrap"><a$1><span class="faux-button">$2</span> <span class="screen-reader-text">"%1$s"</span></a></div>', get_the_title( get_the_ID() ) ), $html );
 }
-add_filter( 'the_content_more_link', 'atap_read_more_tag' );
+add_filter( 'the_content_more_link', 'gia_read_more_tag' );
 
-function atap_news_shortcode($params) {
+function gia_news_shortcode($params) {
     $args = array(
                 'post_type' => 'post',
                 'cat' => $params['id'],
@@ -282,9 +261,9 @@ function atap_news_shortcode($params) {
     wp_reset_postdata();
     return $html;
 }
-add_shortcode( 'atap_news', 'atap_news_shortcode');
+add_shortcode( 'gia_news', 'gia_news_shortcode');
 
-function atap_carousel_shortcode($params) {
+function gia_carousel_shortcode($params) {
     $args = array(
                 'post_type' => 'post',
                 'cat' => $params['id'],
@@ -294,7 +273,7 @@ function atap_carousel_shortcode($params) {
                 'posts_per_page' => $params['limit'],
             );
     $get_post = new WP_Query( $args );
-    $html = '<div class="atap_carousel-'.$params['id'].' owl-carousel owl-theme cus-carousel">';
+    $html = '<div class="gia_carousel-'.$params['id'].' owl-carousel owl-theme cus-carousel">';
     while ( $get_post->have_posts() ) : $get_post->the_post();  
         $url = get_the_permalink();
         $post_tags = get_the_tags();
@@ -323,7 +302,7 @@ function atap_carousel_shortcode($params) {
     endwhile;
     $html .= '</div>';
     $html .= '<script>$( document ).ready(function() {
-        $(".atap_carousel-'.$params['id'].'").owlCarousel({
+        $(".gia_carousel-'.$params['id'].'").owlCarousel({
             nav: true,
             loop:true,
             dots: false,
@@ -340,7 +319,7 @@ function atap_carousel_shortcode($params) {
     wp_reset_postdata();
     return $html;
 }
-add_shortcode( 'atap_carousel', 'atap_carousel_shortcode');
+add_shortcode( 'gia_carousel', 'gia_carousel_shortcode');
 
 function customfield_slider_shortcode($params) {
     
@@ -356,7 +335,7 @@ function customfield_slider_shortcode($params) {
                         <div class="fied-content">
                             <h4 class="title">'.get_sub_field('title').'</h4>
                             <a href="'.get_sub_field('learn_more').'" target="_self">
-                                <span class="learn_more">'.__('Learn More', 'atap').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></span>
+                                <span class="learn_more">'.__('Learn More', 'gia').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></span>
                             </a>
                         </div>
                     </div>
@@ -389,11 +368,11 @@ function header_search_shortcode(){
                 <a href="#" class="close_menu" id="close_menu_search"></a>
                 <div class="search_input">
                     <form role="search" method="get" class="search-form" action="'.esc_url( home_url( '/' ) ).'"> 
-                        <input name="s" type="search" value="'.get_search_query().'" size="25" class="search_text" placeholder="'.__('Search Keywords ...', 'atap').'"> 
+                        <input name="s" type="search" value="'.get_search_query().'" size="25" class="search_text" placeholder="'.__('Search Keywords ...', 'gia').'"> 
                         <button class="sbtn" id="sbtn" type="button">sbtn</button>
                      </form>
                 </div>
-                <p>'.__('Hit enter to search or ESC to close', 'atap').'</p>
+                <p>'.__('Hit enter to search or ESC to close', 'gia').'</p>
             </div>';
     return $html;        
 }
@@ -402,7 +381,7 @@ add_shortcode( 'search-box', 'header_search_shortcode');
 
 function apat_breadcrumbs() {
     $delimiter = '<span class="delimiter"> &nbsp / &nbsp </span>';
-    $home = __('Home', 'atap'); 
+    $home = __('Home', 'gia'); 
     $before = '<span class="current">'; 
     $after = '</span>'; 
     if ( !is_home() && !is_front_page() || is_paged() ) {
@@ -462,14 +441,14 @@ function apat_breadcrumbs() {
             foreach ($breadcrumbs as $crumb) echo $crumb . ' ' . $delimiter . ' ';
             echo $before . get_the_title() . $after;
         } elseif ( is_search() ) {
-            echo $before . __('Search results for ', 'atap') . get_search_query() . '"' . $after;
+            echo $before . __('Search results for ', 'gia') . get_search_query() . '"' . $after;
         } elseif ( is_tag() ) {
-            echo $before .  __('Posts tagged ', 'atap') . single_tag_title('', false) . '"' . $after;
+            echo $before .  __('Posts tagged ', 'gia') . single_tag_title('', false) . '"' . $after;
         } elseif ( is_author() ) {
             global $author;
-            echo $before . __('Articles posted by ', 'atap') . $userdata->display_name . $after;
+            echo $before . __('Articles posted by ', 'gia') . $userdata->display_name . $after;
         } elseif ( is_404() ) {
-            echo $before . __('Error 404', 'atap') . $after;
+            echo $before . __('Error 404', 'gia') . $after;
         }
         echo '</ul>';
     }
@@ -535,7 +514,7 @@ function more_post_ajax(){
                                 $out .= '<span class="post-cate" style="background: '.$color.'">'.  esc_html( $category->name ).'</span>';
                             }
                         }
-                        $out .= '<a class="more-link" href="'.  get_permalink().'">'. __('Read More', 'atap') .' &nbsp <i class="fal fa-arrow-right"></i></a>
+                        $out .= '<a class="more-link" href="'.  get_permalink().'">'. __('Read More', 'gia') .' &nbsp <i class="fal fa-arrow-right"></i></a>
                     </div>
                 </div>
              </div>';
@@ -647,7 +626,7 @@ if( function_exists('acf_add_options_page') ) {
     )); 
 }
 
-function atap_excerpt($word_count_limit) {
+function gia_excerpt($word_count_limit) {
     $content = wp_strip_all_tags(get_the_content() , true );
     echo wp_trim_words($content, $word_count_limit);
 }
@@ -996,13 +975,13 @@ function add_search_form($items, $args) {
                   . '<input type="search" class="search-field" placeholder="' . esc_attr_x( 'Search Keywords', 'placeholder' ) . '" value="' . get_search_query() . '" name="s" title="' . esc_attr_x( 'Search for:', 'label' ) . '" />'
                   . '</label>'
                   . '<button type="submit" class="search-submit" value="'. esc_attr_x('Search', 'submit button') .'"><i class="far fa-search"></i></button>'
-                  . '</form><div class="languages-box"><span><i aria-hidden="true" class="fas fa-globe"></i>EN</span></div>'
+                  . '</form>'
                   . '</li>';
           }
         return $items;
 }
-add_filter( 'document_title_separator', 'atap_document_title_separator' );
-function atap_document_title_separator( $sep ) {
+add_filter( 'document_title_separator', 'gia_document_title_separator' );
+function gia_document_title_separator( $sep ) {
 
     $sep = "|";
 
@@ -1077,14 +1056,14 @@ function create_contact_form_pdf($cf7)
         $table_calulator = '<table cellspacing="0" cellpadding="5" width= "100%">
             <tbody>
             <tr bgcolor="yellow">
-            <td style="border: 1px solid #000000;" width= "5%" align="center">'.__('No', 'atap').'</td>
-            <td style="border: 1px solid #000000;" width= "40%" align="center">'.__('Product Name', 'atap').'</td>
-            <td style="border: 1px solid #000000;" width= "15%" align="center">'.__('Quantity', 'atap').'</td>
-            <td style="border: 1px solid #000000;" width= "20%" align="center">'.__('Unit Price', 'atap').'</td>
-            <td style="border: 1px solid #000000;" width= "20%" align="center">'.__('Total Price', 'atap').'</td>
+            <td style="border: 1px solid #000000;" width= "5%" align="center">'.__('No', 'gia').'</td>
+            <td style="border: 1px solid #000000;" width= "40%" align="center">'.__('Product Name', 'gia').'</td>
+            <td style="border: 1px solid #000000;" width= "15%" align="center">'.__('Quantity', 'gia').'</td>
+            <td style="border: 1px solid #000000;" width= "20%" align="center">'.__('Unit Price', 'gia').'</td>
+            <td style="border: 1px solid #000000;" width= "20%" align="center">'.__('Total Price', 'gia').'</td>
             </tr>
             <tr bgcolor="yellow">
-            <td style="border: 1px solid #000000;" width= "100%" colspan="5">'.__('Professional Service', 'atap').'</td>
+            <td style="border: 1px solid #000000;" width= "100%" colspan="5">'.__('Professional Service', 'gia').'</td>
             </tr>';  
             
         $to_currency = 'USD';
@@ -1156,7 +1135,7 @@ function create_contact_form_pdf($cf7)
         
         $table_calulator .= '
             <tr>
-            <td style="border-bottom: none;" width= "80%" align="right" colspan="4">'.__('Sub Total', 'atap').'</td>
+            <td style="border-bottom: none;" width= "80%" align="right" colspan="4">'.__('Sub Total', 'gia').'</td>
             <td style="border: 1px solid #000000;" width= "20%" align="right">'.currencyFormat($subtoal, $to_currency).'</td>
             </tr>
             <tr>
@@ -1164,7 +1143,7 @@ function create_contact_form_pdf($cf7)
             <td style="border: 1px solid #000000;" width= "20%" align="right">'.currencyFormat($gst_amt, $to_currency).'</td>
             </tr>
             <tr>
-            <td style="border-bottom: none;" width= "80%" align="right" colspan="4"><strong>'.__('Total', 'atap').'</strong></td>
+            <td style="border-bottom: none;" width= "80%" align="right" colspan="4"><strong>'.__('Total', 'gia').'</strong></td>
             <td style="border: 1px solid #000000;" width= "20%" align="right"><strong>'.currencyFormat($toal, $to_currency).'</strong></td>
             </tr>
             </tbody>
@@ -1261,7 +1240,7 @@ function solutions_hover_shortcode() {
                                             <h4>'.get_sub_field('title').'</h4>
                                             <p>'.get_sub_field('description').'</p>
                                             <p><img src="'.$image['url'].'" class="size-large" alt=""></p>
-                                            <a target="_self" href="'.get_sub_field('learn_more').'">'.__('Learn More', 'atap').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></a>';
+                                            <a target="_self" href="'.get_sub_field('learn_more').'">'.__('Learn More', 'gia').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></a>';
                                             $download_pdf = get_sub_field('download_pdf');                                            
                                             if($download_pdf){
                                                 $html .='<p><a href="'.$download_pdf['url'].'">'.$download_pdf['title'].' <i class="fal fa-download"></i></a></p>'; 
@@ -1293,7 +1272,7 @@ function solutions_tech_shortcode() {
                             <p data-mh="desc">'.get_sub_field('description').'</p>
                             <p data-mh="logo"><img src="'.$image['url'].'" class="size-large" alt=""></p>
                             <div data-mh="link">
-                                <p ><a href="'.get_sub_field('learn_more').'" target="_self">'.__('Learn More', 'atap').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></a></p>';
+                                <p ><a href="'.get_sub_field('learn_more').'" target="_self">'.__('Learn More', 'gia').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></a></p>';
                                 $download_pdf = get_sub_field('download_pdf');
                                 if($download_pdf){
                                     $html .='<p><a href="'.$download_pdf['url'].'">'.$download_pdf['title'].' <i class="fal fa-download"></i></a></p>'; 
@@ -1363,7 +1342,7 @@ function more_ondemand_ajax(){
             	            <div class="post-date">'. get_the_date('l, F d, Y') .'</div>        
                          </div>
                          <div class="col-md-3" >
-                            <a class="btn btn-fxwidth" data-toggle="modal" data-target="#videoModal'. get_the_ID() .'">'.__('Watch', 'atap').'</a>
+                            <a class="btn btn-fxwidth" data-toggle="modal" data-target="#videoModal'. get_the_ID() .'">'.__('Watch', 'gia').'</a>
                          </div>
                      </div>
                  </div> 
@@ -1441,7 +1420,7 @@ function more_upcoming_ajax(){
                             <div class="post-date">'.  $date_event .'</div>        
                         </div>
                         <div class="col-md-3" >
-                            <a class="btn btn-fxwidth" data-toggle="modal" data-target="#detailModal'.  get_the_ID() .'" data-event_name="'. get_the_title() .'" >'.__('View Detail', 'atap').'</a>
+                            <a class="btn btn-fxwidth" data-toggle="modal" data-target="#detailModal'.  get_the_ID() .'" data-event_name="'. get_the_title() .'" >'.__('View Detail', 'gia').'</a>
                         </div>
                     </div>
                 </div>
@@ -1538,7 +1517,7 @@ function more_success_story_ajax(){
                         $out .= '</div>';
                         
                         if( $download_pdf ):
-                            $out .= '<a href="'.$download_pdf['url'].'">'.__('Download PDF', 'atap').' <i class="fal fa-download"></i></a>';
+                            $out .= '<a href="'.$download_pdf['url'].'">'.__('Download PDF', 'gia').' <i class="fal fa-download"></i></a>';
                         endif;
                     $out .= '</div>
                     

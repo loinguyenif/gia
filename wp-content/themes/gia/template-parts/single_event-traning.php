@@ -46,7 +46,7 @@ if($full_images){
             </div>
             <div class="post-inner">
                 <div class="entry-content">
-                    <?php the_content( __( 'Continue reading', 'atap' ) );?>
+                    <?php the_content( __( 'Continue reading', 'gia' ) );?>
                 </div><!-- .entry-content -->
             </div><!-- .post-inner -->
             

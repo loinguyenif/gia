@@ -25,14 +25,14 @@ $full_image = get_field('full_image', $term);
         
             <header class="single-header">
                 <div class="back">
-                    <a href="javascript:history.back()" class="btn-back"><i class="fal fa-arrow-left"></i> &nbsp <?php echo __('Back', 'atap' ) ;?></a>
+                    <a href="javascript:history.back()" class="btn-back"><i class="fal fa-arrow-left"></i> &nbsp <?php echo __('Back', 'gia' ) ;?></a>
                 </div>
             </header>
             <br />
             <h3 class="post-title"><?php the_title();?></h3>
             
             <ul class="social-share">
-                <li><a><?php echo __('Share:', 'atap' );?> </a></li>
+                <li><a><?php echo __('Share:', 'gia' );?> </a></li>
                 <li>
                     <a target="_blank" href="https://www.facebook.com/sharer/sharer.php?u=<?php the_permalink(); ?>">
                         <i class="fab fa-facebook-f"></i>
@@ -55,7 +55,7 @@ $full_image = get_field('full_image', $term);
 	</div>
 </div><!-- #site-content -->
 
-<?php the_content( __( 'Continue reading', 'atap' ) );?>
+<?php the_content( __( 'Continue reading', 'gia' ) );?>
 
 
 <?php get_footer(); ?>

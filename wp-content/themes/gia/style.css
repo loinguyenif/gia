@@ -1,6 +1,5 @@
 /*
 Theme Name: GIA
-Text Domain: gia
 Theme URI: https://wordpress.org/themes/gia/
 Author: the WordPress team
 Author URI: https://wordpress.org
@@ -11,68 +10,57 @@ Requires PHP: 7.2
 Version: 1.5
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, block-patterns, rtl-language-support, sticky-post, threaded-comments, translation-ready, wide-blocks, block-styles, style-variations, accessibility-ready, blog, portfolio, news
+Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, featured-images, full-site-editing, block-patterns, sticky-post, threaded-comments, wide-blocks, block-styles, style-variations, accessibility-ready, blog, portfolio, news
 */
 
 /*--------------------------------------------------------------
 >>> CSS Reset:
 ----------------------------------------------------------------*/
 body {
-  font-family: "Noto Sans JP", Sans-serif;
+  font-family: "DINOT-Regular";
   font-size: 16px;
   line-height: 28px;
-  color: #231815;
-  background-color: #fafafa;
+  color: #333;
+  background-color: #fff;
 }
-body.wpml-lang-vi {
-  font-family: "Roboto Condensed";
+p {
+  color: #000000;
+  font-size: 16px;
+  line-height: 1.5;
+  font-family: "DINOT-Regular";
+  margin: 0 0 10px;
 }
-/*h1,
+h1,
 h2,
 h3,
 h4,
 h5,
-h6,
-p,
-blockquote,
-address,
-big,
-cite,
-code,
-em,
-font,
-img,
-small,
-strike,
-sub,
-sup,
-fieldset,
-form,
-label,
-legend,
-button,
-table,
-caption,
-tr,
-th,
-td {
-	border: none;
-	font-size: inherit;
-	line-height: inherit;
-	margin: 0;
-	padding: 0;
-	text-align: inherit;
-}*/
+h6 {
+  font-family: "DINOT-Black";
+  color: #000000;
+}
+h2 {
+  font-size: 48px;
+  line-height: 55px;
+}
+h3 {
+  font-family: "DINOT-Medium";
+  font-size: 28px;
+  margin: 5px 0;
+}
+h4 {
+  margin-bottom: 25px;
+  font-size: 17px;
+  line-height: 21px;
+}
+img {
+  display: block;
+  vertical-align: middle;
+}
 
 blockquote::before,
 blockquote::after {
   content: "";
-}
-
-p {
-  line-height: 26px;
-  margin: 0 0 16px 0 !important;
-  letter-spacing: 1px;
 }
 
 em,
@@ -140,9 +128,14 @@ hr {
   border-color: #dcd7ca;
   margin: 4rem 0;
 }
+a {
+  color: #337ab7;
+  text-decoration: none;
+}
 a:hover,
 a:focus {
   text-decoration: none;
+  color: #23527c;
 }
 .error404 #site-content {
   padding-top: 4rem;

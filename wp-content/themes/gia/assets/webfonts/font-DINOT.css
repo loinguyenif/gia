@@ -1,0 +1,79 @@
+@font-face {
+  font-family: 'DINOT-Black';
+  src: url('DINOT-Black.eot?#iefix') format('embedded-opentype'),  url('DINOT-Black.otf')  format('opentype'),
+	     url('DINOT-Black.woff') format('woff'), url('DINOT-Black.ttf')  format('truetype'), url('DINOT-Black.svg#DINOT-Black') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-BlackItalic';
+  src: url('DINOT-BlackItalic.eot?#iefix') format('embedded-opentype'),  url('DINOT-BlackItalic.otf')  format('opentype'),
+	     url('DINOT-BlackItalic.woff') format('woff'), url('DINOT-BlackItalic.ttf')  format('truetype'), url('DINOT-BlackItalic.svg#DINOT-BlackItalic') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-Bold';
+  src: url('DINOT-Bold.eot?#iefix') format('embedded-opentype'),  url('DINOT-Bold.otf')  format('opentype'),
+	     url('DINOT-Bold.woff') format('woff'), url('DINOT-Bold.ttf')  format('truetype'), url('DINOT-Bold.svg#DINOT-Bold') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-BoldItalic';
+  src: url('DINOT-BoldItalic.eot?#iefix') format('embedded-opentype'),  url('DINOT-BoldItalic.otf')  format('opentype'),
+	     url('DINOT-BoldItalic.woff') format('woff'), url('DINOT-BoldItalic.ttf')  format('truetype'), url('DINOT-BoldItalic.svg#DINOT-BoldItalic') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-Light';
+  src: url('DINOT-Light.eot?#iefix') format('embedded-opentype'),  url('DINOT-Light.otf')  format('opentype'),
+	     url('DINOT-Light.woff') format('woff'), url('DINOT-Light.ttf')  format('truetype'), url('DINOT-Light.svg#DINOT-Light') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-LightItalic';
+  src: url('DINOT-LightItalic.eot?#iefix') format('embedded-opentype'),  url('DINOT-LightItalic.otf')  format('opentype'),
+	     url('DINOT-LightItalic.woff') format('woff'), url('DINOT-LightItalic.ttf')  format('truetype'), url('DINOT-LightItalic.svg#DINOT-LightItalic') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-Medium';
+  src: url('DINOT-Medium.eot?#iefix') format('embedded-opentype'),  url('DINOT-Medium.otf')  format('opentype'),
+	     url('DINOT-Medium.woff') format('woff'), url('DINOT-Medium.ttf')  format('truetype'), url('DINOT-Medium.svg#DINOT-Medium') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-MediumItalic';
+  src: url('DINOT-MediumItalic.eot?#iefix') format('embedded-opentype'),  url('DINOT-MediumItalic.otf')  format('opentype'),
+	     url('DINOT-MediumItalic.woff') format('woff'), url('DINOT-MediumItalic.ttf')  format('truetype'), url('DINOT-MediumItalic.svg#DINOT-MediumItalic') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-Regular';
+  src: url('DINOT-Regular.eot?#iefix') format('embedded-opentype'),  url('DINOT-Regular.otf')  format('opentype'),
+	     url('DINOT-Regular.woff') format('woff'), url('DINOT-Regular.ttf')  format('truetype'), url('DINOT-Regular.svg#DINOT-Regular') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT-RegularItalic';
+  src: url('DINOT-RegularItalic.eot?#iefix') format('embedded-opentype'),  url('DINOT-RegularItalic.otf')  format('opentype'),
+	     url('DINOT-RegularItalic.woff') format('woff'), url('DINOT-RegularItalic.ttf')  format('truetype'), url('DINOT-RegularItalic.svg#DINOT-RegularItalic') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}

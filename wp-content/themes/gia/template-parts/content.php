@@ -12,7 +12,7 @@
 			if ( is_search() || ! is_singular() && 'summary' === get_theme_mod( 'blog_content', 'full' ) ) {
 				the_excerpt();
 			} else {
-				the_content( __( 'Continue reading', 'atap' ) );
+				the_content( __( 'Continue reading', 'gia' ) );
 			}
 			?>
 		</div><!-- .entry-content -->
@@ -22,7 +22,7 @@
 		<?php
 		wp_link_pages(
 			array(
-				'before'      => '<nav class="post-nav-links bg-light-background" aria-label="' . esc_attr__( 'Page', 'atap' ) . '"><span class="label">' . __( 'Pages:', 'atap' ) . '</span>',
+				'before'      => '<nav class="post-nav-links bg-light-background" aria-label="' . esc_attr__( 'Page', 'gia' ) . '"><span class="label">' . __( 'Pages:', 'gia' ) . '</span>',
 				'after'       => '</nav>',
 				'link_before' => '<span class="page-number">',
 				'link_after'  => '</span>',
