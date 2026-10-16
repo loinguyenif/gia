@@ -140,11 +140,24 @@
 
     if (!mobile) {
       menu.querySelectorAll(".gia-nav-mega__links > li > a").forEach(function (link) {
-        var svg = iconFor(link.textContent, link.parentElement);
-        if (svg) {
+        var imageUrl = link.getAttribute("data-gia-menu-icon");
+        var svg = imageUrl ? "" : iconFor(link.textContent, link.parentElement);
+
+        if (imageUrl || svg) {
           var icon = document.createElement("span");
           icon.className = "gia-nav-icon";
-          icon.innerHTML = svg;
+
+          if (imageUrl) {
+            var image = document.createElement("img");
+            image.src = imageUrl;
+            image.alt = "";
+            image.setAttribute("aria-hidden", "true");
+            image.decoding = "async";
+            icon.appendChild(image);
+          } else {
+            icon.innerHTML = svg;
+          }
+
           link.prepend(icon);
         }
       });
@@ -161,6 +174,33 @@
   var mobileMenu = document.querySelector(".gia-nav__list--mobile");
   prepareMenu(desktopMenu, false);
   prepareMenu(mobileMenu, true);
+
+  var header = document.querySelector(".gia-header");
+  var mainHeader = header && header.querySelector(".gia-header__main");
+  var audienceBar = header && header.querySelector(".gia-header__audience-bar");
+
+  if (header && mainHeader && audienceBar) {
+    var scrollFrame = 0;
+
+    function updateStickyMainHeader() {
+      var threshold = audienceBar.offsetHeight;
+      var mainHeight = mainHeader.offsetHeight;
+
+      header.style.setProperty("--gia-header-main-height", mainHeight + "px");
+      header.classList.toggle("gia-header--main-fixed", window.scrollY >= threshold);
+      scrollFrame = 0;
+    }
+
+    function requestStickyHeaderUpdate() {
+      if (!scrollFrame) {
+        scrollFrame = window.requestAnimationFrame(updateStickyMainHeader);
+      }
+    }
+
+    updateStickyMainHeader();
+    window.addEventListener("scroll", requestStickyHeaderUpdate, { passive: true });
+    window.addEventListener("resize", requestStickyHeaderUpdate);
+  }
 
   if (desktopMenu) {
     desktopMenu.addEventListener("pointerleave", function () {

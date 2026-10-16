@@ -346,6 +346,117 @@ function gia_header_filter_expanded_menu_items( $items, $args ) {
 add_filter( 'wp_nav_menu_objects', 'gia_header_filter_expanded_menu_items', 10, 2 );
 
 /**
+ * Add an optional uploaded icon field to each menu item in Appearance > Menus.
+ *
+ * @param int      $item_id Menu item ID.
+ * @param WP_Post  $item    Menu item object.
+ * @param int      $depth   Menu item depth.
+ * @param stdClass $args    Menu arguments.
+ * @param int      $id      Menu item ID.
+ */
+function gia_menu_item_icon_field( $item_id, $item, $depth, $args, $id ) {
+    $attachment_id = absint( get_post_meta( $item_id, '_gia_menu_icon_id', true ) );
+    $image_url = $attachment_id ? wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) : false;
+    ?>
+    <p class="description description-wide gia-menu-icon-field">
+        <label for="edit-menu-item-gia-icon-<?php echo esc_attr( $item_id ); ?>">
+            <?php
+            printf(
+                /* translators: %s: menu item title. */
+                esc_html__( 'Menu icon for %s', 'gia' ),
+                esc_html( wp_strip_all_tags( $item->title ) )
+            );
+            ?>
+        </label><br>
+        <input
+            type="hidden"
+            class="edit-menu-item-gia-icon"
+            id="edit-menu-item-gia-icon-<?php echo esc_attr( $item_id ); ?>"
+            name="menu-item-gia-icon[<?php echo esc_attr( $item_id ); ?>]"
+            value="<?php echo esc_attr( $attachment_id ); ?>"
+        >
+        <span class="gia-menu-icon-preview"<?php echo $image_url ? '' : ' hidden'; ?>>
+            <?php if ( $image_url ) : ?>
+                <img src="<?php echo esc_url( $image_url ); ?>" alt="" width="36" height="36">
+            <?php endif; ?>
+        </span>
+        <button type="button" class="button gia-menu-icon-upload">
+            <?php esc_html_e( 'Choose image', 'gia' ); ?>
+        </button>
+        <button type="button" class="button gia-menu-icon-remove"<?php echo $image_url ? '' : ' hidden'; ?>>
+            <?php esc_html_e( 'Remove', 'gia' ); ?>
+        </button>
+        <span class="description"><?php esc_html_e( 'Optional. Overrides the automatic menu icon.', 'gia' ); ?></span>
+    </p>
+    <?php
+}
+add_action( 'wp_nav_menu_item_custom_fields', 'gia_menu_item_icon_field', 10, 5 );
+
+/**
+ * Save the uploaded icon attachment ID for a menu item.
+ *
+ * @param int   $menu_id         Menu ID.
+ * @param int   $menu_item_db_id Menu item ID.
+ * @param array $args            Menu item data.
+ */
+function gia_save_menu_item_icon( $menu_id, $menu_item_db_id, $args ) {
+    if ( ! current_user_can( 'edit_theme_options' ) || ! isset( $_POST['menu-item-gia-icon'][ $menu_item_db_id ] ) ) {
+        return;
+    }
+
+    $attachment_id = absint( wp_unslash( $_POST['menu-item-gia-icon'][ $menu_item_db_id ] ) );
+
+    if ( $attachment_id && wp_attachment_is_image( $attachment_id ) ) {
+        update_post_meta( $menu_item_db_id, '_gia_menu_icon_id', $attachment_id );
+    } else {
+        delete_post_meta( $menu_item_db_id, '_gia_menu_icon_id' );
+    }
+}
+add_action( 'wp_update_nav_menu_item', 'gia_save_menu_item_icon', 10, 3 );
+
+/**
+ * Expose a menu item's uploaded icon URL to the front-end header script.
+ *
+ * @param array    $atts     Link attributes.
+ * @param WP_Post  $menu_item Menu item object.
+ * @param stdClass $args     Menu arguments.
+ * @param int      $depth    Menu item depth.
+ * @return array
+ */
+function gia_menu_item_icon_link_attribute( $atts, $menu_item, $args, $depth ) {
+    $attachment_id = absint( get_post_meta( $menu_item->ID, '_gia_menu_icon_id', true ) );
+    $image_url = $attachment_id ? wp_get_attachment_image_url( $attachment_id, 'thumbnail' ) : false;
+
+    if ( $image_url ) {
+        $atts['data-gia-menu-icon'] = esc_url( $image_url );
+    }
+
+    return $atts;
+}
+add_filter( 'nav_menu_link_attributes', 'gia_menu_item_icon_link_attribute', 10, 4 );
+
+/**
+ * Load the media picker controls on the WordPress menu editor.
+ *
+ * @param string $hook_suffix Current admin page hook.
+ */
+function gia_enqueue_menu_icon_admin_assets( $hook_suffix ) {
+    if ( 'nav-menus.php' !== $hook_suffix ) {
+        return;
+    }
+
+    wp_enqueue_media();
+    wp_enqueue_script(
+        'gia-menu-icon-admin',
+        THEME_URL . '/assets/js/gia-menu-icon-admin.js',
+        array( 'jquery', 'media-editor', 'media-views' ),
+        wp_get_theme()->get( 'Version' ),
+        true
+    );
+}
+add_action( 'admin_enqueue_scripts', 'gia_enqueue_menu_icon_admin_assets' );
+
+/**
  * Mark the active primary menu item.
  *
  * @param array    $classes   Existing menu item classes.

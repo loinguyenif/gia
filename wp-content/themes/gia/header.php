@@ -10,7 +10,7 @@
 	<body <?php body_class(); ?>>
 		<?php wp_body_open(); ?>
 
-		<?php if ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) : ?>
+		<?php if ( ! is_front_page() && ( ! function_exists( 'elementor_theme_do_location' ) || ! elementor_theme_do_location( 'header' ) ) ) : ?>
 			<header class="gia-header">
 				<div class="gia-header__audience-bar">
 					<nav class="gia-header__container gia-header__audience-nav" aria-label="<?php esc_attr_e( 'Audience navigation', 'gia' ); ?>">
