@@ -78,7 +78,9 @@
       button.type = "button";
       button.setAttribute("aria-expanded", "false");
       button.setAttribute("aria-label", "Toggle submenu for " + link.textContent.trim());
-      button.innerHTML = '<span aria-hidden="true">&#8964;</span>';
+      button.innerHTML = mobile
+        ? '<span aria-hidden="true">&#8964;</span>'
+        : '<i class="fal fa-angle-down" aria-hidden="true"></i>';
       submenu.id = (mobile ? "gia-nav-mobile-submenu-" : "gia-nav-desktop-submenu-") + index;
       button.setAttribute("aria-controls", submenu.id);
       link.after(button);

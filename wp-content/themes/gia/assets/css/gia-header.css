@@ -47,7 +47,7 @@
   align-items: center;
   padding: 0 16px;
   color: #fff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 500;
   text-decoration: none;
 }
@@ -132,7 +132,8 @@
   display: flex;
   width: 100%;
   align-items: stretch;
-  justify-content: space-between;
+  justify-content: flex-end;
+  column-gap: 18px;
 }
 
 .gia-nav__list--desktop > li {
@@ -149,17 +150,25 @@
   min-height: 126px;
   padding: 0 13px;
   color: #111;
-  font-size: 16px;
+  font-size: 18px;
   line-height: 1.3;
   text-decoration: none;
   white-space: nowrap;
 }
 
+.gia-nav__list--desktop > li:focus-within,
+.gia-nav__list--desktop > li.is-open,
+.gia-nav__list--desktop > li.current-menu-item,
+.gia-nav__list--desktop > li.current-menu-ancestor {
+  background: #f0f2f7;
+}
+
+.gia-nav__list--desktop > li:hover > a,
 .gia-nav__list--desktop > li:focus-within > a,
 .gia-nav__list--desktop > li.is-open > a,
 .gia-nav__list--desktop > li.current-menu-item > a,
 .gia-nav__list--desktop > li.current-menu-ancestor > a {
-  background: #f0f2f7;
+  color: #d65f1d;
 }
 
 .gia-nav__submenu-toggle {
@@ -173,6 +182,7 @@
   background: transparent;
   color: #d65f1d;
   cursor: pointer;
+  font-size: 20px;
 }
 
 .gia-nav__submenu-toggle span {
@@ -273,7 +283,9 @@
 }
 
 .gia-nav__list--desktop.gia-nav__list--escape-closed > li:hover > .gia-nav-mega,
-.gia-nav__list--desktop.gia-nav__list--escape-closed > li:focus-within > .gia-nav-mega {
+.gia-nav__list--desktop.gia-nav__list--escape-closed
+  > li:focus-within
+  > .gia-nav-mega {
   opacity: 0;
   pointer-events: none;
   transform: translateY(8px);
@@ -307,22 +319,32 @@
 .gia-nav-mega__intro h2 {
   margin: 0 0 10px;
   color: #222;
-  font-family: "DINOT-Regular", Arial, sans-serif;
-  font-size: 26px;
-  font-weight: 400;
-  line-height: 1.25;
+  font-family: "DINOT-Regular";
+  font-size: 26px !important;
+  font-weight: 400 !important;
+  line-height: 1.25 !important;
 }
 
 .gia-nav-mega__intro a {
   color: #d65f1d;
-  font-family: "DINOT-Bold", "DINOT-Medium", Arial, sans-serif;
-  font-size: 14px;
+  font-family: "DINOT-Bold", "DINOT-Medium";
+  font-size: 15px;
   text-decoration: none;
+  display: inline-block;
+  vertical-align: middle;
+  -webkit-transform: perspective(1px) translateZ(0);
+  transform: perspective(1px) translateZ(0);
+  box-shadow: 0 0 1px transparent;
+  -webkit-transition-duration: 0.3s;
+  transition-duration: 0.3s;
+  -webkit-transition-property: transform;
+  transition-property: transform;
 }
 
 .gia-nav-mega__intro a:hover,
 .gia-nav-mega__intro a:focus-visible {
-  text-decoration: underline;
+  -webkit-transform: translateX(8px);
+  transform: translateX(8px);
 }
 
 .gia-nav-mega__links {
@@ -567,6 +589,10 @@
     font-size: 15px;
   }
 
+  .gia-nav__list--desktop {
+    column-gap: 8px;
+  }
+
   .gia-nav-mega__inner {
     gap: 22px;
   }
@@ -658,7 +684,6 @@
   .gia-nav__list--mobile .gia-nav-icon {
     display: none;
   }
-
 }
 
 @media (prefers-reduced-motion: reduce) {

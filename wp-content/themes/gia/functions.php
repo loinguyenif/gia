@@ -93,6 +93,7 @@ function gia_register_styles() {
     wp_enqueue_style( 'style-css', get_stylesheet_uri(), array(), $theme_version );
     wp_enqueue_style( 'responsive-css', THEME_URL . '/assets/css/responsive.css', array());
     wp_enqueue_style( 'gia-header-css', THEME_URL . '/assets/css/gia-header.css', array(), $theme_version );
+    wp_enqueue_style( 'gia-footer-css', THEME_URL . '/assets/css/gia-footer.css', array( 'gia-header-css' ), $theme_version );
 }
 add_action( 'wp_enqueue_scripts', 'gia_register_styles' );
 
@@ -479,6 +480,135 @@ function gia_header_audience_menu_classes( $classes, $menu_item, $args ) {
 }
 add_filter( 'nav_menu_css_class', 'gia_header_audience_menu_classes', 10, 3 );
 
+/**
+ * Return the footer menu location for the active primary audience item.
+ *
+ * @return string
+ */
+function gia_footer_menu_location() {
+    $active_item = gia_header_get_active_primary_item();
+    $active_audience = $active_item ? sanitize_title( $active_item->title ) : gia_header_current_audience();
+
+    return 'agents' === $active_audience ? 'footer_agents' : 'footer_consumers';
+}
+
+/**
+ * Render footer menu groups as columns, collecting top-level links without children.
+ *
+ * @param string $location Menu location.
+ * @return string
+ */
+function gia_footer_render_menu_columns( $location ) {
+    $locations = get_nav_menu_locations();
+
+    if ( empty( $locations[ $location ] ) ) {
+        return '';
+    }
+
+    $menu_id = (int) $locations[ $location ];
+    $items   = wp_get_nav_menu_items( $menu_id );
+
+    if ( ! is_array( $items ) ) {
+        return '';
+    }
+
+    $children_by_parent = array();
+    $root_items         = array();
+
+    foreach ( $items as $item ) {
+        $parent_id = (int) $item->menu_item_parent;
+
+        if ( 0 === $parent_id ) {
+            $root_items[] = $item;
+        } else {
+            $children_by_parent[ $parent_id ][] = $item;
+        }
+    }
+
+    $group_items    = array();
+    $standalone_ids = array();
+    $collect_ids    = function ( $item_id ) use ( &$collect_ids, &$children_by_parent ) {
+        $ids = array( $item_id );
+
+        if ( ! empty( $children_by_parent[ $item_id ] ) ) {
+            foreach ( $children_by_parent[ $item_id ] as $child ) {
+                $ids = array_merge( $ids, $collect_ids( (int) $child->ID ) );
+            }
+        }
+
+        return $ids;
+    };
+
+    foreach ( $root_items as $item ) {
+        $item_id = (int) $item->ID;
+
+        if ( ! empty( $children_by_parent[ $item_id ] ) ) {
+            $group_items[] = $collect_ids( $item_id );
+        } else {
+            $standalone_ids[] = $item_id;
+        }
+    }
+
+    if ( empty( $group_items ) && empty( $standalone_ids ) ) {
+        return '';
+    }
+
+    $render_column = function ( $item_ids, $column_number ) use ( $menu_id ) {
+        $filter_items = function ( $menu_items, $args ) use ( $item_ids ) {
+            if ( empty( $args->gia_footer_item_ids ) ) {
+                return $menu_items;
+            }
+
+            $included_ids = array_flip( array_map( 'intval', $args->gia_footer_item_ids ) );
+
+            return array_values(
+                array_filter(
+                    $menu_items,
+                    function ( $menu_item ) use ( $included_ids ) {
+                        return isset( $included_ids[ (int) $menu_item->ID ] );
+                    }
+                )
+            );
+        };
+
+        add_filter( 'wp_nav_menu_objects', $filter_items, 10, 2 );
+        $column_html = wp_nav_menu(
+            array(
+                'menu'                => $menu_id,
+                'container'           => false,
+                'menu_class'          => 'gia-footer__column-menu',
+                'menu_id'             => 'gia-footer-menu-column-' . (int) $column_number,
+                'depth'               => 0,
+                'fallback_cb'         => false,
+                'echo'                => false,
+                'gia_footer_item_ids' => $item_ids,
+            )
+        );
+        remove_filter( 'wp_nav_menu_objects', $filter_items, 10 );
+
+        return $column_html;
+    };
+
+    $columns_html  = '';
+    $column_number = 1;
+
+    foreach ( $group_items as $item_ids ) {
+        $columns_html .= '<div class="gia-footer__column gia-footer__column--group">';
+        $columns_html .= $render_column( $item_ids, $column_number++ );
+        $columns_html .= '</div>';
+    }
+
+    if ( ! empty( $standalone_ids ) ) {
+        $columns_html .= '<div class="gia-footer__column gia-footer__column--standalone">';
+        $columns_html .= $render_column( $standalone_ids, $column_number );
+        $columns_html .= '</div>';
+    }
+
+    $layout_class = empty( $group_items ) ? ' gia-footer__columns--single' : '';
+
+    return '<div class="gia-footer__columns' . $layout_class . '">' . $columns_html . '</div>';
+}
+
 
 /**
  * Register and Enqueue Scripts.
@@ -509,8 +639,8 @@ function gia_menus() {
         'primary'  => __( 'Main Menu Level 1', 'gia' ),
         'expanded' => __( 'Main Menu Level 2 (grouped by Level 1)', 'gia' ),
         'mobile'   => __( 'Mobile Menu', 'gia' ),
-        'footer'   => __( 'Footer Menu', 'gia' ),
-        'social'   => __( 'Social Menu', 'gia' ),
+        'footer_consumers' => __( 'Footer Consumers', 'gia' ),
+        'footer_agents' => __( 'Footer Agents', 'gia' ),
     );
 
     register_nav_menus( $locations );
@@ -573,195 +703,6 @@ function gia_get_custom_logo( $html ) {
 }
 add_filter( 'get_custom_logo', 'gia_get_custom_logo' );
 
-/**
- * Register widget areas.
- *
- * @link https://developer.wordpress.org/themes/functionality/sidebars/#registering-a-sidebar
- */
-function gia_sidebar_registration() {
-
-	// Arguments used in all register_sidebar() calls.
-	$shared_args = array(
-		'before_title'  => '<h2 class="widget-title subheading heading-size-3">',
-		'after_title'   => '</h2>',
-		'before_widget' => '<div class="widget %2$s"><div class="widget-content">',
-		'after_widget'  => '</div></div>',
-	);
-
-	// Footer #1.
-	register_sidebar(
-		array_merge(
-			$shared_args,
-			array(
-				'name'        => __( 'Footer #1', 'gia' ),
-				'id'          => 'sidebar-1',
-				'description' => __( 'Widgets in this area will be displayed in the first column in the footer.', 'gia' ),
-			)
-		)
-	);
-
-	// Footer #2.
-	register_sidebar(
-		array_merge(
-			$shared_args,
-			array(
-				'name'        => __( 'Footer #2', 'gia' ),
-				'id'          => 'sidebar-2',
-				'description' => __( 'Widgets in this area will be displayed in the second column in the footer.', 'gia' ),
-			)
-		)
-	);
-    
-}
-
-add_action( 'widgets_init', 'gia_sidebar_registration' );
-
-
-/**
- * Overwrite default more tag with styling and screen reader markup.
- */
-function gia_read_more_tag( $html ) {
-    return preg_replace( '/<a(.*)>(.*)<\/a>/iU', sprintf( '<div class="read-more-button-wrap"><a$1><span class="faux-button">$2</span> <span class="screen-reader-text">"%1$s"</span></a></div>', get_the_title( get_the_ID() ) ), $html );
-}
-add_filter( 'the_content_more_link', 'gia_read_more_tag' );
-
-function gia_news_shortcode($params) {
-    $args = array(
-                'post_type' => 'post',
-                'cat' => $params['id'],
-                'post_status' => 'publish',
-                'order' => 'DESC',
-                'orderby' => 'date',
-                'posts_per_page' => $params['limit'],
-            );
-    $get_post = new WP_Query( $args );
-    $html = '<div class="news_latest">';
-    while ( $get_post->have_posts() ) : $get_post->the_post();  
-        $html .='<div class="post-box row">';  
-        $html .='   <div class="col-md-3 post-date">'.get_the_date('d F Y').'</div>';               
-        $html .='   <div class="col-md-9"><a href="'.get_the_permalink().'">'.get_the_title().'</a></div>';         
-        $html .='</div>';      
-    endwhile;
-    $html .= '</div>';
-    wp_reset_postdata();
-    return $html;
-}
-add_shortcode( 'gia_news', 'gia_news_shortcode');
-
-function gia_carousel_shortcode($params) {
-    $args = array(
-                'post_type' => 'post',
-                'cat' => $params['id'],
-                'post_status' => 'publish',
-                'order' => 'DESC',
-                'orderby' => 'date',
-                'posts_per_page' => $params['limit'],
-            );
-    $get_post = new WP_Query( $args );
-    $html = '<div class="gia_carousel-'.$params['id'].' owl-carousel owl-theme cus-carousel">';
-    while ( $get_post->have_posts() ) : $get_post->the_post();  
-        $url = get_the_permalink();
-        $post_tags = get_the_tags();
-        $tags_name = $first = ''; 
-        if ( $post_tags ) {
-            foreach( $post_tags as $tag ) {
-                $tags_name .= $first.$tag->name; 
-                $first = ', ';
-            }
-        }
-        $image_url = (get_the_post_thumbnail_url())?get_the_post_thumbnail_url():site_url().'/wp-content/uploads/no-image.jpg';
-
-        $html .='<div class="slide_content">
-                <div class="carousel-box">  
-                    <a href="'.$url.'" class="boxImage" style="background-image: url('.$image_url.');"></a>
-                    <div class="post-content" data-mh="carousel-group">
-                        <div class="post-tags">'.$tags_name.'</div>
-                        <div class="post-meta">
-                            <h5><a href="'.$url.'">'.get_the_title().'</a></h5>
-                        </div>
-                        <div class="post-date">'.get_the_date('d F Y').'</div>
-                    </div>
-                </div>
-              </div>';    
-
-    endwhile;
-    $html .= '</div>';
-    $html .= '<script>$( document ).ready(function() {
-        $(".gia_carousel-'.$params['id'].'").owlCarousel({
-            nav: true,
-            loop:true,
-            dots: false,
-            margin: 15,
-            navText: [\'<i class="fal fa-arrow-left"></i>\', \'<i class="fal fa-arrow-right"></i>\'],
-            responsive: {
-                0: {items: 1},
-                600: {items: 2},
-                1000: {items: 3}
-            }
-        });
-    });</script>';
-    
-    wp_reset_postdata();
-    return $html;
-}
-add_shortcode( 'gia_carousel', 'gia_carousel_shortcode');
-
-function customfield_slider_shortcode($params) {
-    
-    $html = '<div class="customfield_carousel">';
-    $html .='<div class="row ">';
-    if( have_rows($params['id'], 'options') ){  
-       
-        while( have_rows($params['id'], 'options') ) : the_row(); 
-            $image = get_sub_field('image');
-            $html .='<div class="col-md-4 pb-3">
-                    <div class="image-box item" style="background-image: url('.$image['url'].');">  
-                        <div class="background-overlay"></div>
-                        <div class="fied-content">
-                            <h4 class="title">'.get_sub_field('title').'</h4>
-                            <a href="'.get_sub_field('learn_more').'" target="_self">
-                                <span class="learn_more">'.__('Learn More', 'gia').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></span>
-                            </a>
-                        </div>
-                    </div>
-                  </div>';    
-    
-        endwhile;
-        $html .= '</div>';
-        $html .= '</div>';
-        /*$limit = (isset($params['limit']))?$params['limit']:4;
-        $html .= '<script>$( document ).ready(function() {                      
-                $(".customfield_slider-'.$params['id'].'").owlCarousel({
-                    nav: true,                  
-                    dots: false,
-                    margin: 10,
-                    navText: [\'<i class="fal fa-arrow-left"></i>\', \'<i class="fal fa-arrow-right"></i>\'],
-                    responsive: {
-                        0: {items: 1},
-                        600: {items: 2},
-                        1000: {items: '.$limit.'}
-                    }
-                });              
-        });</script>';*/  
-    }
-    return $html;
-}
-add_shortcode( 'customfield_slider', 'customfield_slider_shortcode');
-
-function header_search_shortcode(){
-    $html ='<div class="search_box" id="search_box"> 
-                <a href="#" class="close_menu" id="close_menu_search"></a>
-                <div class="search_input">
-                    <form role="search" method="get" class="search-form" action="'.esc_url( home_url( '/' ) ).'"> 
-                        <input name="s" type="search" value="'.get_search_query().'" size="25" class="search_text" placeholder="'.__('Search Keywords ...', 'gia').'"> 
-                        <button class="sbtn" id="sbtn" type="button">sbtn</button>
-                     </form>
-                </div>
-                <p>'.__('Hit enter to search or ESC to close', 'gia').'</p>
-            </div>';
-    return $html;        
-}
-add_shortcode( 'search-box', 'header_search_shortcode');
 
 
 function apat_breadcrumbs() {
@@ -914,109 +855,6 @@ add_action('wp_ajax_nopriv_more_post_ajax', 'more_post_ajax');
 add_action('wp_ajax_more_post_ajax', 'more_post_ajax');
 
 
-function event_post_ajax(){
-    $ppp = (isset($_POST["ppp"])) ? $_POST["ppp"] : 9;
-    $page = (isset($_POST['pageNumber'])) ? $_POST['pageNumber'] : 0;
-    $cat = (isset($_POST['cat'])) ? $_POST['cat'] : 0;
-    $orderby = (isset($_POST['orderby'])) ? $_POST['orderby'] : 0;
-    $subcat = (isset($_POST['subcat'])) ? $_POST['subcat'] : 0;
-    $s = (isset($_POST['s'])) ? $_POST['s'] : 0;
-
-    header("Content-Type: text/html");
-    
-    $curent_id = $cat;
-    if($subcat) $cat = $subcat;
-    $args = array(
-        's' => $s,
-        'post_type' => 'post',
-        'post_status' => 'publish',
-        'posts_per_page' => $ppp,
-        'cat' => $cat,
-        'paged'    => $page,
-    );
-    
-    switch ($orderby) {
-        case 'date_desc':
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-            break;
-            
-        case 'title_asc':
-            $orderby = array(
-                'orderby' => 'title',
-                'order' => 'ASC',
-            );
-            break;
-        
-        default:
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-    }
-
-    $loop = new WP_Query($args+$orderby);
-    $out = '';
-    if ($loop -> have_posts()) :  while ($loop -> have_posts()) : $loop -> the_post();
-        $categories = get_the_category();
-        $image_url = (get_the_post_thumbnail_url())?get_the_post_thumbnail_url():site_url().'/wp-content/uploads/no-image.jpg';
-        
-        $out .= '<div class="col-md-4" >
-                <div class="carousel-box">  
-                    <a href="'.get_permalink().'" class="boxImage" style="background-image: url('.$image_url.');"></a>
-                    <div class="post-content" data-mh="carousel-group">';
-                        if ( ! empty( $categories ) ) {
-                            foreach($categories as $category) {
-                                if($curent_id == $category->term_id) continue;
-                                $out .= '<div class="post-tags">'.esc_html( $category->name ).'</div>';
-                            }
-                        }
-                        $out .= '<div class="post-meta">
-                            <h5><a href="'.get_permalink().'">'.get_the_title().'</a></h5>
-                        </div>
-                        <div class="post-date">'.get_the_date('d F Y').'</div>
-                    </div>
-                </div>
-             </div>';
-
-    endwhile;
-    endif;
-    wp_reset_postdata();
-    die($out);
-}
-
-add_action('wp_ajax_nopriv_event_post_ajax', 'event_post_ajax');
-add_action('wp_ajax_event_post_ajax', 'event_post_ajax');
-
-
-add_filter( 'get_the_archive_title', function ( $title ) {
-    if( is_category()) {
-        $title = single_cat_title( '', false );
-    } elseif ( is_post_type_archive() ) {
-        $title = post_type_archive_title( '', false );
-    }
-    return $title;
-});
-
-if( function_exists('acf_add_options_page') ) {
-    
-    acf_add_options_page(array(
-        'page_title'    => 'Theme General Settings',
-        'menu_title'    => 'GIA Settings',
-        'menu_slug'     => 'theme-general-settings',
-        'capability'    => 'edit_posts',
-        'redirect'      => false
-    )); 
-}
-
-function gia_excerpt($word_count_limit) {
-    $content = wp_strip_all_tags(get_the_content() , true );
-    echo wp_trim_words($content, $word_count_limit);
-}
-
-
 function filter_product(){
   
     $catId = (isset($_POST['id'])) ? $_POST['id'] : '';
@@ -1130,35 +968,6 @@ add_action('wp_ajax_nopriv_filter_product', 'filter_product');
 add_action('wp_ajax_filter_product', 'filter_product');
 
 
-function show_subcat(){
-
-    if(isset($_POST["parentId"])){
-        $term_id = $_POST["parentId"];
-        $text=$_POST["text"]; 
-        $args = array(
-              'hide_empty' => 0,
-              'orderby' => 'name',
-              'depth' => 1,
-              'parent' => $term_id,
-              'order' => 'ASC',
-              'taxonomy' => 'product-cat'
-            );
-        $term_children = get_categories($args);
-        $out .='<option value="" disabled selected>--- '.$text.' ---</option>';
-        foreach ( $term_children as $child ) {
-            $out .= '<option value="'.$child->term_id.'">'.$child->name.'</option>';
-        } 
-    }
-    else{
-        $out .= '';
-    }
-   die($out);
-}
-
-add_action('wp_ajax_nopriv_show_subcat', 'show_subcat');
-add_action('wp_ajax_show_subcat', 'show_subcat');
-
-
 function get_post_loadmore() {
     $offset = isset($_POST['offset']) ? (int)$_POST['offset'] : 0; 
     $args = array(
@@ -1222,134 +1031,6 @@ function get_post_loadmore() {
 add_action('wp_ajax_loadmore', 'get_post_loadmore');
 add_action('wp_ajax_nopriv_loadmore', 'get_post_loadmore');
 
-function campaign_filter_product(){
-  
-    $paged = (isset($_POST['pageNumber'])) ? $_POST['pageNumber'] : 0;
-    $keyword = (isset($_POST['keyword'])) ? $_POST['keyword'] : '';
-    $orderby = (isset($_POST['orderby'])) ? $_POST['orderby'] : '';
-    
-    $args = array(
-        'post_type' => 'product',
-        'tax_query' => array(                 
-          array(
-            'taxonomy' => 'product-type',               
-            'field' => 'slug', 
-            'terms' => 'campaign'
-          )),
-        'paged' => $paged,
-        's'     => $keyword,
-        'posts_per_page'=> 9
-    );
-    
-    switch ($orderby) {
-        case 'date_desc':
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-            break;
-            
-        case 'date_asc':
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'ASC',
-            );
-            break; 
-
-        default:
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-    }
-    $loop = new WP_Query($args+$orderby);
-    if ($loop -> have_posts()) :  while ($loop -> have_posts()) : $loop -> the_post();
-        global $product;
-        $categories = get_the_terms( $product->ID, 'product-cat' );
-        $image_url = (get_the_post_thumbnail_url())?get_the_post_thumbnail_url():site_url().'/wp-content/uploads/no-image.jpg';
-        
-        $out .= '<div class="col-12 col-md-4 mb-4 pb-2">
-                    <div class="product-item">
-                        <div class="product-image">
-                            <a href="'.get_the_permalink().'">
-                                <img src="'.$image_url.'">
-                                <span class="product-cat">Campaign</span>     
-                             </a>
-                        </div>
-                        <div class="product-meta">';
-                            $categories = get_the_terms( $product->ID, 'product-cat' );
-                                foreach ($categories as $categorie) {
-                                    if($categorie->parent == 0){
-                                       $out .= '<div class="product-cate text-capitalize mb-2">'.$categorie->name.'</div>';
-                                    }
-                                }
-                            $out .= '<h3 class="product-title mb-4"><a href="'.get_the_permalink().'">'. get_the_title().'</a></h3>';
-                                if( get_field('campaign_duration') ){
-                                            $out .= '<div class="date-stock">'.get_field('campaign_duration').'</div>';  
-                                } 
-                        
-                           
-                        $out .= '</div>
-                        </div>
-                    </div>
-                </div>';
-    endwhile;
-    endif;
-    wp_reset_postdata();
-    
-    $res = array();
-    $res['result'] = $loop->max_num_pages;
-    $res['out'] = $out;
-    echo json_encode($res);
-    die();
-    
-  
-}
-
-add_action('wp_ajax_nopriv_campaign_filter_product', 'campaign_filter_product');
-add_action('wp_ajax_campaign_filter_product', 'campaign_filter_product');
-
-
-add_action( 'wpcf7_init', 'postselect2' );
-function postselect2() {
-    wpcf7_add_form_tag( 'listproduct', 'custom_post_select2', true );
-}
-function custom_post_select2( $tag ) {
-
-    $output = '<div class="position-relative select-box"><input type="search" id="brand-filter" placeholder="Please select" name="product" data-list="product-list" autocomplete="off" required />
-            <label for="brand-filter" data-icon=""></label></div><datalist id="product-list"><select>';
-
-                    if( have_rows('product_list','option') ):
-
-                        while( have_rows('product_list','option') ) : the_row();
-
-                             $output .= '<option value="'. get_sub_field('product_name','option') .'">'.get_sub_field('product_name','option').'</option>';
-
-                        endwhile;
-
-                    else :
-                   
-                    endif;
-   
-    $output .= '</select></datalist>';
-    return $output;
-} 
-// function custom_post_select2( $tag ) {
-  
-//     $args=array(
-//         'post_type' => 'product',
-//         'posts_per_page' => -1
-//      );
-//     $loop = get_posts( $args );
-//     $output = '<div class="position-relative select-box"><input type="search" id="brand-filter" placeholder="Please select" name="product" data-list="product-list" autocomplete="off" required />
-//             <label for="brand-filter" data-icon=""></label></div><datalist id="product-list"><select>';
-  
-//     foreach ( $loop as $product ) {
-//         $output .= '<option value="'. $product->post_title .'">'.$product->post_title.'</option>';
-//     } 
-//     $output .= '</select></datalist>';
-//     return $output;
-// } 
 
 function add_search_form($items, $args) {
           if( $args->menu == 'main-menu' ){
@@ -1364,555 +1045,4 @@ function add_search_form($items, $args) {
                   . '</li>';
           }
         return $items;
-}
-add_filter( 'document_title_separator', 'gia_document_title_separator' );
-function gia_document_title_separator( $sep ) {
-
-    $sep = "|";
-
-    return $sep;
-
-}
-
-add_action( 'wpcf7_before_send_mail', 'create_contact_form_pdf' );
-function create_contact_form_pdf($cf7)
-{
-    //check if it is the registration form
-    if ($cf7->id != 3802)
-        return;
-    
-    //include pdf generation file//
-    require_once('class/tcpdf_cf7.php');
-    $submission = WPCF7_Submission::get_instance();
-    if ($submission){
-        $posted_data = $submission->get_posted_data();
-        
-        $products = array(); 
-        //set default        
-        $product = new stdClass();
-        $product->product_name = $posted_data['product'];
-        $product->number_product = $posted_data['number-of-product'][0];
-        //$product->qty = $posted_data['quantity'];
-        $product->qty = 1;
-        $products[0] = $product;
-        //set array                
-        if($posted_data['product_name']){        
-            for($i = 1; $i <= count($posted_data['product_name']); $i++){
-                $product = new stdClass();
-                $product->product_name = $posted_data['product_name'][$i];
-                $product->number_product = $posted_data['number_product'][$i];
-                //$product->qty = $posted_data['qty'][$i];  
-                $product->qty = 1;                                               
-                $products[$i] = $product;       
-            }                
-        }
-        
-        //get from config        
-        $product_list = array();                      
-        if( have_rows('product_list','option') ):
-            while( have_rows('product_list','option') ) : the_row();
-                $product = new stdClass();  
-                $product->product_name = get_sub_field('product_name','option');
-                $product->limit1 = get_sub_field('limit1','option');
-                $product->limit2 = get_sub_field('limit2','option');
-                $product->limit3 = get_sub_field('limit3','option');                                                
-                $product_list[$product->product_name] = $product;                 
-            endwhile;
-        endif;  
-        $partner_country = array();                      
-        if( have_rows('partner_country','option') ):
-            while( have_rows('partner_country','option') ) : the_row();
-                $country = new stdClass();  
-                $country->country = get_sub_field('country','option');
-                $country->address_details = get_sub_field('address_details','option');                                                
-                $partner_country[$country->country] = $country;                 
-            endwhile;
-        endif;  
-        
-        
-        
-        //render html                                
-        $params = array();
-        $params['$partner_country'] = '';
-        if(isset($partner_country[$posted_data['partner-country'][0]]->address_details)){
-            $params['$partner_country'] = nl2br($partner_country[$posted_data['partner-country'][0]]->address_details);
-        }
-        
-        $table_calulator = '<table cellspacing="0" cellpadding="5" width= "100%">
-            <tbody>
-            <tr bgcolor="yellow">
-            <td style="border: 1px solid #000000;" width= "5%" align="center">'.__('No', 'gia').'</td>
-            <td style="border: 1px solid #000000;" width= "40%" align="center">'.__('Product Name', 'gia').'</td>
-            <td style="border: 1px solid #000000;" width= "15%" align="center">'.__('Quantity', 'gia').'</td>
-            <td style="border: 1px solid #000000;" width= "20%" align="center">'.__('Unit Price', 'gia').'</td>
-            <td style="border: 1px solid #000000;" width= "20%" align="center">'.__('Total Price', 'gia').'</td>
-            </tr>
-            <tr bgcolor="yellow">
-            <td style="border: 1px solid #000000;" width= "100%" colspan="5">'.__('Professional Service', 'gia').'</td>
-            </tr>';  
-            
-        $to_currency = 'USD';
-        //get price
-        $i = 1;
-        $subtoal = 0; 
-        foreach($products as $product){  
-            $item = $product_list[$product->product_name];
-            //get price day
-            $check = str_replace(" ", "", $product->number_product);
-            switch ($check) {
-                case "From1to10":
-                    $arr = explode('|', $item->limit1);
-                    break;
-                case "From11to30":
-                    $arr = explode('|', $item->limit2);
-                    break;
-                case "Over31":
-                    $arr = explode('|', $item->limit3);
-                    break;
-            }
-
-            //set price day
-            if($arr){
-                $price_unit = $price_total = 0;
-                if(isset($arr[0]) && $arr[0]){
-                    $price_unit = $arr[0];
-                    
-                    //currencyConverter
-                    /*if($from_currency != $to_currency){
-                        $price_unit = currencyConverter($price_unit, $from_currency, $to_currency); 
-                    }*/
-                    //get currency
-                    if($posted_data['partner-country'][0] == 'Thailand'){
-                        if(isset($arr[1]) && $arr[1]){
-                            $price_unit = $arr[1];
-                            $to_currency = 'THB';
-                        }
-                    }
-                                                            
-                    if($posted_data['partner-country'][0] == 'China'){
-                        if(isset($arr[2]) && $arr[2]){
-                            $price_unit = $arr[2];
-                            $to_currency = 'CNY';
-                        }
-                    }                  
-                    
-                    $price_total =  $product->qty * $price_unit;
-                    $subtoal += $price_total;
-                }
-                
-            }
-              
-            $number_product_text = ' x '.$product->number_product.' units'; 
-                
-            $table_calulator .= '<tr>
-                <td width= "5%" style="border: 1px solid #000000;" >'.$i.'</td>
-                <td width= "40%" style="border: 1px solid #000000;" >'.$product->product_name.$number_product_text.'</td>
-                <td width= "15%" style="border: 1px solid #000000;" align="right">'.$product->qty.'</td>
-                <td width= "20%" style="border: 1px solid #000000;" align="right">'.number_format( $price_unit, 0, '.', ',').'</td>
-                <td width= "20%" style="border: 1px solid #000000;" align="right">'.currencyFormat($price_total, $to_currency).'</td>
-            </tr>';    
-            $i++; 
-        }
-        
-        //calulator
-        $gst_amt = $subtoal * 7 / 100;   
-        $toal = $subtoal + $gst_amt;
-        
-        $table_calulator .= '
-            <tr>
-            <td style="border-bottom: none;" width= "80%" align="right" colspan="4">'.__('Sub Total', 'gia').'</td>
-            <td style="border: 1px solid #000000;" width= "20%" align="right">'.currencyFormat($subtoal, $to_currency).'</td>
-            </tr>
-            <tr>
-            <td style="border-bottom: none;" width= "80%" align="right" colspan="4">7% GST</td>
-            <td style="border: 1px solid #000000;" width= "20%" align="right">'.currencyFormat($gst_amt, $to_currency).'</td>
-            </tr>
-            <tr>
-            <td style="border-bottom: none;" width= "80%" align="right" colspan="4"><strong>'.__('Total', 'gia').'</strong></td>
-            <td style="border: 1px solid #000000;" width= "20%" align="right"><strong>'.currencyFormat($toal, $to_currency).'</strong></td>
-            </tr>
-            </tbody>
-            </table>';
-        $params['$table_calulator'] = $table_calulator;
-        $params['$user_company_name'] = $posted_data['user-company-name'];
-        $params['$partner_company_name'] = $posted_data['partner-company-name'];
-        $params['$partner-person-name'] = $posted_data['partner-person-name'];
-        $params['$partner-person-email'] = $posted_data['partner-person-email'];
-        $params['$partner-person-tel'] = $posted_data['partner-person-tel'];
-        $params['$date'] = date('d-M-y');
-        
-        //quotation_no
-        global $wpdb; 
-        $no = 0;
-        $results = $wpdb->get_results( "SELECT * FROM {$wpdb->prefix}cf7_vdata_quotation_no WHERE date = DATE(NOW()) ORDER BY no DESC LIMIT 1", OBJECT );
-        if($results[0]){
-            $no = $results[0]->no;
-        }
-        $no++;
-        $params['$quotation_no'] = date('Ymd').'-'.str_pad($no, 2, '0', STR_PAD_LEFT);;
-        
-        // create new PDF document
-        $createpdf = new CREATE_PDFCF7();
-        //upload path
-        $uploads = wp_upload_dir();
-        define ('PDF_FILE_PATH',$uploads['basedir']);
-        $fname = $createpdf->CREATE_PDFCF7Fn($params, PDF_FILE_PATH);
-        //set filenames
-        $pdf_filename= PDF_FILE_PATH.$fname;
-        //use the same tag used in contact form 7 mail tab
-        $submission->add_uploaded_file('submission_pdf', $pdf_filename);
-        
-        //save quotation_no
-        $wpdb->insert('wp_cf7_vdata_quotation_no', array( 
-                'cf7_id' => '3802',
-                'date' => date('Y-m-d'), 
-                'no' => $no,
-                'param' => json_encode($posted_data)
-            )
-        );
-    }
-}
-
-
-function currencyConverter($amount, $from_currency, $to_currency) {
-    $from_to = $from_currency.'_'.$to_currency;
-    $rate = file_get_contents('https://free.currconv.com/api/v7/convert?q='.$from_to.'&compact=ultra&apiKey=3706bf71d621a0f4d40d');
-    $rate = json_decode($rate);
-    return $amount * $rate->$from_to;
-}
-
-function currencyFormat($value, $to_currency = ''){
-	$price = number_format ( (float) $value, 2, '.', ',');
-	return $price.$to_currency;
-}
-
-function register_my_session(){
-    if( ! session_id() ) {
-        session_start();
-    }
-}
-add_action('init', 'register_my_session');
-
-function solutions_hover_shortcode() {
-    $solutions_title = get_field('solutions_title', 'option');
-    $solutions_bg = get_field('solutions_bg', 'option');
-    $html = '<section class="solutions_hover" style="background-image: url('.$solutions_bg['url'].');">';
-    if( have_rows('solutions_hover', 'options') ){  
-        $html .= '<div class="container">'; 
-        $html .= '   <h2>'.$solutions_title.'</h2>';
-        $html .= '   <div class="row">';
-        $html .= '       <div class="col-md-6">';
-        $html .= '           <div class="row">';
-        
-                            $i = 0;
-                            while( have_rows('solutions_hover', 'options') ) : the_row(); 
-                                $html .='<div class="col-md-6">
-                                        <a target="_self" class="hover_title" data-id="'.$i.'" data-mh="hover_title" href="'.get_sub_field('learn_more').'">'.get_sub_field('title').'</a>
-                                    </div>';   
-                                $i++; 
-                            endwhile;
-                            
-        $html .= '          </div>';      
-        $html .= '      </div>';  
-        
-        $html .= '       <div class="col-md-6">';
-        
-                            $i = 0;
-                            while( have_rows('solutions_hover', 'options') ) : the_row(); 
-                                $image = get_sub_field('logo');
-                                $show = ($i == 0)?'show':'';
-                                $html .='<div id="box-hover'.$i.'" class="box-hover '.$show.'">
-                                            <h4>'.get_sub_field('title').'</h4>
-                                            <p>'.get_sub_field('description').'</p>
-                                            <p><img src="'.$image['url'].'" class="size-large" alt=""></p>
-                                            <a target="_self" href="'.get_sub_field('learn_more').'">'.__('Learn More', 'gia').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></a>';
-                                            $download_pdf = get_sub_field('download_pdf');                                            
-                                            if($download_pdf){
-                                                $html .='<p><a href="'.$download_pdf['url'].'">'.$download_pdf['title'].' <i class="fal fa-download"></i></a></p>'; 
-                                            }
-                                $html .='</div>';    
-                                $i++;
-                            endwhile;
- 
-        $html .= '      </div>';  
-        $html .= '  </div>';  
-        $html .= '</div>';  
-    }
-    $html .= '</section>';  
-    return $html;
-}
-add_shortcode( 'solutions_hover', 'solutions_hover_shortcode');
-
-function solutions_tech_shortcode() {
-    $html = '<section class="solutions_tech">';
-    if( have_rows('solutions_hover', 'options') ){  
-        $html .= '<div class="container">'; 
-        $html .= '   <div class="row">';
-        
-            while( have_rows('solutions_hover', 'options') ) : the_row(); 
-                $image = get_sub_field('logo');
-                $html .= '<div class="col-md-4">
-                        <div class="box-item" href="'.get_sub_field('learn_more').'" target="_self">
-                            <h4 data-mh="title">'.get_sub_field('title').'</h4>
-                            <p data-mh="desc">'.get_sub_field('description').'</p>
-                            <p data-mh="logo"><img src="'.$image['url'].'" class="size-large" alt=""></p>
-                            <div data-mh="link">
-                                <p ><a href="'.get_sub_field('learn_more').'" target="_self">'.__('Learn More', 'gia').' &nbsp; <i aria-hidden="true" class="fas fa-arrow-right"></i></a></p>';
-                                $download_pdf = get_sub_field('download_pdf');
-                                if($download_pdf){
-                                    $html .='<p><a href="'.$download_pdf['url'].'">'.$download_pdf['title'].' <i class="fal fa-download"></i></a></p>'; 
-                                }
-                 $html .=   '</div>
-                        </div>
-                    </div>';    
-            endwhile;
-  
-        $html .= '  </div>';  
-        $html .= '</div>';  
-    }
-    $html .= '</section>';  
-    return $html;
-}
-add_shortcode( 'solutions_tech', 'solutions_tech_shortcode');
-
-
-function more_ondemand_ajax(){
-    $ppp = (isset($_POST["ppp"])) ? $_POST["ppp"] : 9;
-    $page = (isset($_POST['pageNumber'])) ? $_POST['pageNumber'] : 0;
-    $cat = (isset($_POST['cat'])) ? $_POST['cat'] : 0;
-    $orderby = (isset($_POST['orderby'])) ? $_POST['orderby'] : 0;
-    $s = (isset($_POST['s'])) ? $_POST['s'] : 0;
-
-    header("Content-Type: text/html");
-    $args = array(
-        's' => $s,
-        'post_type' => 'post',
-        'post_status' => 'publish',
-        'tag' => 'on-demand',
-        'posts_per_page' => $ppp,
-        'cat' => $cat,
-        'paged'    => $page,
-    );
-    
-    switch ($orderby) {
-        case 'date_desc':
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-            break;
-            
-        case 'title_asc':
-            $orderby = array(
-                'orderby' => 'title',
-                'order' => 'ASC',
-            );
-            break;
-        
-        default:
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-    }
-
-    $loop = new WP_Query($args+$orderby);
-    $out = '';
-    if ($loop -> have_posts()) :  while ($loop -> have_posts()) : $loop -> the_post();
-        $categories = get_the_category();
-        $out .= '<div class="item">  
-                     <div class="row">
-                         <div class="col-md-9" >
-            	            <h4 class="post-title">'. get_the_title() .'</h4>
-            	            <div class="post-date">'. get_the_date('l, F d, Y') .'</div>        
-                         </div>
-                         <div class="col-md-3" >
-                            <a class="btn btn-fxwidth" data-toggle="modal" data-target="#videoModal'. get_the_ID() .'">'.__('Watch', 'gia').'</a>
-                         </div>
-                     </div>
-                 </div> 
-                 <!-- Modal -->
-                <div class="modal fade cus-modal" id="videoModal'.  get_the_ID() .'" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <a class="close" data-dismiss="modal" aria-label="Close"><i class="eicon-close"></i></a>
-                                <iframe width="100%" height="500" src="'. $youtube_embeb .'" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                            </div>
-                        </div>
-                    </div>
-                </div>';
-
-    endwhile;
-    endif;
-    wp_reset_postdata();
-    die($out);
-}
-add_action('wp_ajax_nopriv_more_ondemand_ajax', 'more_ondemand_ajax');
-add_action('wp_ajax_more_ondemand_ajax', 'more_ondemand_ajax');
-
-
-function more_upcoming_ajax(){
-    $ppp = (isset($_POST["ppp"])) ? $_POST["ppp"] : 9;
-    $page = (isset($_POST['pageNumber'])) ? $_POST['pageNumber'] : 0;
-    $cat = (isset($_POST['cat'])) ? $_POST['cat'] : 0;
-    $orderby = (isset($_POST['orderby'])) ? $_POST['orderby'] : 0;
-    $s = (isset($_POST['s'])) ? $_POST['s'] : 0;
-
-    header("Content-Type: text/html");
-    $args = array(
-        's' => $s,
-        'post_type' => 'post',
-        'post_status' => 'publish',
-        'tag' => 'upcoming',
-        'posts_per_page' => $ppp,
-        'cat' => $cat,
-        'paged'    => $page,
-    );
-    
-    switch ($orderby) {
-        case 'date_desc':
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-            break;
-            
-        case 'title_asc':
-            $orderby = array(
-                'orderby' => 'title',
-                'order' => 'ASC',
-            );
-            break;
-        
-        default:
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-    }
-
-    $loop = new WP_Query($args+$orderby);
-    $out = '';
-    if ($loop -> have_posts()) :  while ($loop -> have_posts()) : $loop -> the_post();
-        $categories = get_the_category();
-        $date_event = get_field('date_event', get_the_ID()); 
-        $content = get_the_content(); 
-        $out .= '<div class="item">     
-                    <div class="row">
-                        <div class="col-md-9" >
-                            <h4 class="post-title">'.  get_the_title() .'</h4>
-                            <div class="post-date">'.  $date_event .'</div>        
-                        </div>
-                        <div class="col-md-3" >
-                            <a class="btn btn-fxwidth" data-toggle="modal" data-target="#detailModal'.  get_the_ID() .'" data-event_name="'. get_the_title() .'" >'.__('View Detail', 'gia').'</a>
-                        </div>
-                    </div>
-                </div>
-                <!-- Modal -->
-                <div class="modal fade cus-modal" id="detailModal'.  get_the_ID() .'" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-body">
-                                <a class="close" data-dismiss="modal" aria-label="Close"><i class="eicon-close"></i></a>
-                                <h4 class="post-title">'.  get_the_title() .'</h4>
-                                '. $content .'
-                            </div>
-                        </div>
-                    </div>
-                </div>';
-
-    endwhile;
-    endif;
-    wp_reset_postdata();
-    die($out);
-}
-add_action('wp_ajax_nopriv_more_upcoming_ajax', 'more_upcoming_ajax');
-add_action('wp_ajax_more_upcoming_ajax', 'more_upcoming_ajax');
-
-
-function more_success_story_ajax(){
-    $ppp = (isset($_POST["ppp"])) ? $_POST["ppp"] : 9;
-    $page = (isset($_POST['pageNumber'])) ? $_POST['pageNumber'] : 0;
-    $cat = (isset($_POST['cat'])) ? $_POST['cat'] : 0;
-    $orderby = (isset($_POST['orderby'])) ? $_POST['orderby'] : 0;
-    $s = (isset($_POST['s'])) ? $_POST['s'] : 0;
-
-    header("Content-Type: text/html");
-
-    $args = array(
-        's' => $s,
-        'post_type' => 'post',
-        'post_status' => 'publish',
-        'posts_per_page' => $ppp,
-        'cat' => $cat,
-        'paged'    => $page,
-    );
-    
-    switch ($orderby) {
-        case 'date_desc':
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-            break;
-            
-        case 'title_asc':
-            $orderby = array(
-                'orderby' => 'title',
-                'order' => 'ASC',
-            );
-            break;
-        
-        default:
-            $orderby = array(
-                'orderby' => 'date',
-                'order' => 'DESC',
-            );
-    }
-
-    $loop = new WP_Query($args+$orderby);
-    $out = '';
-    if ($loop -> have_posts()) :  while ($loop -> have_posts()) : $loop -> the_post();
-        $categories = get_the_category();
-        $image_url = (get_the_post_thumbnail_url())?get_the_post_thumbnail_url():site_url().'/wp-content/uploads/no-image.jpg';
-        $logo = get_field('logo', get_the_ID());
-        $download_pdf = get_field('download_pdf', get_the_ID());
-        $out .= '<div class="col-md-4" >
-                <div class="carousel-box" data-mh="news-group">
-                    <a href="'.get_permalink().'" class="boxImage" style="background-image: url('.$image_url.');"></a>
-                    <div class="post-content" data-mh="carousel-group">';                    
-                        if ( ! empty( $categories ) ) {
-                            foreach($categories as $category) {
-                                $out .= '<div class="post-tags">'. esc_html( $category->name ) .'</div>';
-                            }
-                        }
-                        
-                        $out .= '<div class="post-meta"><h5>'. get_the_title().'</h5></div>
-                        <div class="row">';
-                        
-                        if($logo):
-                            foreach($logo as $row) {
-                                $out .= '<div class="col-4">
-                                    <div class="logo" style="background-image: url('. $row['image'] .');"></div>
-                                </div>';
-                            } 
-                        endif;
-                        
-                        $out .= '</div>';
-                        
-                        if( $download_pdf ):
-                            $out .= '<a href="'.$download_pdf['url'].'">'.__('Download PDF', 'gia').' <i class="fal fa-download"></i></a>';
-                        endif;
-                    $out .= '</div>
-                    
-                </div>
-             </div>';
-
-    endwhile;
-    endif;
-    wp_reset_postdata();
-    die($out);
-}
-add_action('wp_ajax_nopriv_more_success_story_ajax', 'more_success_story_ajax');
-add_action('wp_ajax_more_success_story_ajax', 'more_success_story_ajax');
+}      

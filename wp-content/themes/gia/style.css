@@ -51,6 +51,13 @@ blockquote::before,
 blockquote::after {
   content: "";
 }
+a {
+  color: #337ab7;
+}
+
+a:hover {
+  color: #23527c;
+}
 
 em,
 i,
