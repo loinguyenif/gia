@@ -77,3 +77,24 @@
   font-weight: normal;
   font-style: normal;
 }
+
+@font-face {
+  font-family: 'DINOT';
+  src: url('DINOT-Regular.woff') format('woff'), url('DINOT-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT';
+  src: url('DINOT-Medium.woff') format('woff'), url('DINOT-Medium.ttf') format('truetype');
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'DINOT';
+  src: url('DINOT-Black.woff') format('woff'), url('DINOT-Black.ttf') format('truetype');
+  font-weight: 900;
+  font-style: normal;
+}

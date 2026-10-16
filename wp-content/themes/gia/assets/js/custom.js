@@ -1,154 +1,176 @@
-jQuery(document).ready(function(){
+jQuery(document).ready(function () {
+  var desktopMenu = document.querySelector(".gia-desktop-menu");
+  if (desktopMenu) {
+    desktopMenu
+      .querySelectorAll("li.menu-item-has-children")
+      .forEach(function (menuItem) {
+        var submenu = menuItem.querySelector(":scope > .sub-menu");
+        var link = menuItem.querySelector(":scope > a");
 
-    var isMulti = (jQuery('.owl-carousel .thumb-item').length > 1) ? true : false;
-    
-    jQuery(".slider-thumb").owlCarousel({
-        loop: isMulti,
-        items:1,
-        nav:isMulti,
-        navText:["<i class='fal fa-arrow-left'></i>","<i class='fal fa-arrow-right'></i>"]
-    });
-    
-    jQuery("#owl-related").owlCarousel({
-        loop:true,
-        nav: true,
-        responsive:{
-            0:{
-                items:1
-            },
-            600:{
-                items:2
-            },
-            1000:{
-                items:3
-            }
-        },
-        navText:["<i class='fal fa-arrow-left'></i>","<i class='fal fa-arrow-right'></i>"]
-    });
-    
-    // Menu fixed hash default
-    jQuery('#menu-hash .elementor-icon-list-items').before('<div class="menu-toggle"></div>');
-    jQuery('#menu-hash .elementor-icon-list-items a').eq(0).addClass('active'); 
-    
-    jQuery(".menu-toggle").on("click",function(){
-        jQuery('#menu-hash .elementor-icon-list-items').toggleClass('hideList');
-    });
-    
+        if (!submenu || !link) {
+          return;
+        }
 
-    // Header search
-    if (jQuery('#open_search').length) {
-        jQuery('#open_search').click(function(){
-            if( jQuery('#search_box').is(':hidden') ){
-                jQuery('#search_box').stop(true, true).slideDown(200);
-                jQuery('body,html').stop().animate({'scrollTop': 0 }, 600);
-            }else{
-                jQuery('#search_box').stop(true, true).slideUp(200);
+        var childItems = submenu.children.length;
+        submenu.classList.add(
+          childItems >= 5 ? "gia-mega-menu" : "gia-dropdown-menu",
+        );
 
-            }
-            return false;
+        var submenuToggle = document.createElement("button");
+        submenuToggle.className = "gia-desktop-submenu-toggle";
+        submenuToggle.type = "button";
+        submenuToggle.setAttribute("aria-expanded", "false");
+        submenuToggle.setAttribute(
+          "aria-label",
+          "Toggle submenu for " + link.textContent.trim(),
+        );
+        submenuToggle.innerHTML = '<span aria-hidden="true">&#8964;</span>';
+        link.after(submenuToggle);
 
-        })
+        submenuToggle.addEventListener("click", function () {
+          var isExpanded =
+            submenuToggle.getAttribute("aria-expanded") === "true";
 
-        jQuery('#close_menu_search').click(function(){
-            jQuery('#search_box').stop(true, true).slideUp(200);
-            return false;
-
-        })
-
-        jQuery(document).keyup(function(e) {
-              //if (e.keyCode === 13) jQuery('.save').click();     // enter
-              if (e.keyCode === 27) jQuery('#search_box').stop(true, true).slideUp(200);
-        });
-
-        // REGEX NUMBER
-        function setInputFilter(textbox, inputFilter) {
-          ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
-            textbox.addEventListener(event, function() {
-              if (inputFilter(this.value)) {
-                this.oldValue = this.value;
-                this.oldSelectionStart = this.selectionStart;
-                this.oldSelectionEnd = this.selectionEnd;
-              } else if (this.hasOwnProperty("oldValue")) {
-                this.value = this.oldValue;
-                this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
-              } else {
-                this.value = "";
+          desktopMenu
+            .querySelectorAll(".is-submenu-open")
+            .forEach(function (openMenuItem) {
+              if (openMenuItem !== menuItem) {
+                openMenuItem.classList.remove("is-submenu-open");
+                var openToggle = openMenuItem.querySelector(
+                  ":scope > .gia-desktop-submenu-toggle",
+                );
+                if (openToggle) {
+                  openToggle.setAttribute("aria-expanded", "false");
+                }
               }
             });
+
+          menuItem.classList.toggle("is-submenu-open", !isExpanded);
+          submenuToggle.setAttribute("aria-expanded", String(!isExpanded));
+        });
+      });
+
+    document.addEventListener("click", function (event) {
+      if (!desktopMenu.contains(event.target)) {
+        desktopMenu
+          .querySelectorAll(".is-submenu-open")
+          .forEach(function (menuItem) {
+            menuItem.classList.remove("is-submenu-open");
+            var submenuToggle = menuItem.querySelector(
+              ":scope > .gia-desktop-submenu-toggle",
+            );
+            if (submenuToggle) {
+              submenuToggle.setAttribute("aria-expanded", "false");
+            }
           });
-        }
-        var input=document.getElementById("intTextBox");
-        if(input) {
-            setInputFilter(input, function(value) {
-                return /^-?\d*$/.test(value);
-            });
-        }
-    }
-    
-    //solutions_hover
-    jQuery( ".hover_title" ).mouseover(function() {
-        jQuery( ".box-hover" ).removeClass('show');
-        var id = jQuery(this).data('id');
-        jQuery( "#box-hover"+id ).addClass('show');
-    });   
-    
-    jQuery(".clickhere").click(function(){
-        jQuery(this).parent().parent().parent().parent().parent().parent().parent().find('.hiddenContent').show();
-        jQuery(this).hide();
-        jQuery(this).parent().find('.clickclose').show();
+      }
     });
-    jQuery(".clickclose").click(function(){
-        jQuery(this).parent().parent().parent().parent().parent().parent().parent().find('.hiddenContent').hide();
-        jQuery(this).hide();
-        jQuery(this).parent().find('.clickhere').show();
-    });  
+  }
+
+  var menuToggle = document.querySelector(".gia-menu-toggle");
+  var mainMenu = document.querySelector(".gia-main-menu");
+  var menuBackdrop = document.querySelector(".gia-menu-backdrop");
+
+  if (menuToggle && mainMenu && menuBackdrop) {
+    var closeMenuButton = mainMenu.querySelector(".gia-main-menu__close");
+
+    function closeMainMenu() {
+      if (mainMenu.hidden) {
+        return;
+      }
+
+      mainMenu.classList.remove("is-open");
+      menuBackdrop.classList.remove("is-visible");
+      menuToggle.setAttribute("aria-expanded", "false");
+      menuToggle.setAttribute("aria-label", "Open main menu");
+      document.documentElement.classList.remove("gia-menu-open");
+
+      mainMenu.addEventListener("transitionend", function onMenuClosed(event) {
+        if (
+          event.target !== mainMenu ||
+          mainMenu.classList.contains("is-open")
+        ) {
+          return;
+        }
+
+        mainMenu.hidden = true;
+        menuBackdrop.hidden = true;
+        menuToggle.focus();
+        mainMenu.removeEventListener("transitionend", onMenuClosed);
+      });
+    }
+
+    function openMainMenu() {
+      mainMenu.hidden = false;
+      menuBackdrop.hidden = false;
+      document.documentElement.classList.add("gia-menu-open");
+      menuToggle.setAttribute("aria-expanded", "true");
+      menuToggle.setAttribute("aria-label", "Close main menu");
+
+      window.requestAnimationFrame(function () {
+        mainMenu.classList.add("is-open");
+        menuBackdrop.classList.add("is-visible");
+
+        var firstMenuLink = mainMenu.querySelector("a");
+        if (firstMenuLink) {
+          firstMenuLink.focus();
+        } else if (closeMenuButton) {
+          closeMenuButton.focus();
+        }
+      });
+    }
+
+    menuToggle.addEventListener("click", function () {
+      if (mainMenu.hidden) {
+        openMainMenu();
+      } else {
+        closeMainMenu();
+      }
+    });
+    menuBackdrop.addEventListener("click", closeMainMenu);
+
+    if (closeMenuButton) {
+      closeMenuButton.addEventListener("click", closeMainMenu);
+    }
+
+    mainMenu
+      .querySelectorAll("li.menu-item-has-children")
+      .forEach(function (menuItem) {
+        var submenu = menuItem.querySelector(":scope > .sub-menu");
+        var link = menuItem.querySelector(":scope > a");
+
+        if (!submenu || !link) {
+          return;
+        }
+
+        var submenuToggle = document.createElement("button");
+        submenuToggle.className = "gia-submenu-toggle";
+        submenuToggle.type = "button";
+        submenuToggle.setAttribute("aria-expanded", "false");
+        submenuToggle.setAttribute(
+          "aria-label",
+          "Show submenu for " + link.textContent.trim(),
+        );
+        submenuToggle.innerHTML = '<span aria-hidden="true">&#8964;</span>';
+        link.after(submenuToggle);
+
+        submenuToggle.addEventListener("click", function () {
+          var isExpanded =
+            submenuToggle.getAttribute("aria-expanded") === "true";
+          submenuToggle.setAttribute("aria-expanded", String(!isExpanded));
+          submenuToggle.setAttribute(
+            "aria-label",
+            (isExpanded ? "Show submenu for " : "Hide submenu for ") +
+              link.textContent.trim(),
+          );
+          menuItem.classList.toggle("is-submenu-open", !isExpanded);
+        });
+      });
+
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "Escape" && !mainMenu.hidden) {
+        closeMainMenu();
+      }
+    });
+  }
 });
-
-jQuery( window ).load(function() {
-    setTimeout(function() {
-        //fiter category
-        var html = '<select id="filter_cate" name="filter_cate">';
-        jQuery('#productsServicesFilterOptions').find(":radio").each(function () {
-            html +='<option value="'+this.value+'">'+$(this).closest("label").text()+'</option>';
-        });
-        html +='</select>';           
-        jQuery('#html_filter_cate').html(html);
-                
-        jQuery('#filter_cate').selectpicker();
-        jQuery('#filter_cate').on('change', function(e){
-            jQuery('#productsServicesFilterOptions').find("input[value='"+this.value+"']").prop("checked", true);
-            jQuery('#applyFilterOptions').click();
-        });          
-        
-        
-        //fiter country
-        var html = '<select id="filter_country" name="filter_country">';
-        jQuery('#filter__country').find(":radio").each(function () {
-            html +='<option value="'+this.value+'">'+$(this).closest("label").text()+'</option>';
-        });
-        html +='</select>';
-                        
-        jQuery('#html_filter_country').html(html);
-        jQuery('#filter_country').selectpicker();     
-        jQuery('#filter_country').on('change', function(e){
-            jQuery('#filter__country').find("input[value='"+this.value+"']").prop("checked", true);
-            jQuery('#applyFilterOptions').click();
-        }); 
-                         
-    }, 2000);
-    
-    
-                   
-});    
-
-jQuery(window).scroll(function() {
-    // Menu fixed hash
-	var scrollDistance = jQuery(window).scrollTop();
-	// Assign active class to nav links while scolling
-	jQuery('.page-section').each(function(i) {
-		if ((jQuery(this).position().top - 250) <= scrollDistance) {
-			jQuery('#menu-hash .elementor-icon-list-items a.active').removeClass('active');
-			jQuery('#menu-hash .elementor-icon-list-items a').eq(i).addClass('active');
-		}
-	});
-}).scroll();

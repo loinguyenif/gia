@@ -18,6 +18,7 @@ Tags: one-column, custom-colors, custom-menu, custom-logo, editor-style, feature
 ----------------------------------------------------------------*/
 body {
   font-family: "DINOT-Regular";
+  font-weight: 400;
   font-size: 16px;
   line-height: 28px;
   color: #333;
@@ -28,6 +29,7 @@ p {
   font-size: 16px;
   line-height: 1.5;
   font-family: "DINOT-Regular";
+  font-weight: 400;
   margin: 0 0 10px;
 }
 h1,
@@ -36,22 +38,9 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: "DINOT-Black";
+  font-family: "DINOT";
+  font-weight: 900;
   color: #000000;
-}
-h2 {
-  font-size: 48px;
-  line-height: 55px;
-}
-h3 {
-  font-family: "DINOT-Medium";
-  font-size: 28px;
-  margin: 5px 0;
-}
-h4 {
-  margin-bottom: 25px;
-  font-size: 17px;
-  line-height: 21px;
 }
 img {
   display: block;
@@ -89,7 +78,7 @@ small {
 
 b,
 strong {
-  font-weight: 700;
+  font-weight: 900;
 }
 
 ins {
@@ -128,15 +117,6 @@ hr {
   border-color: #dcd7ca;
   margin: 4rem 0;
 }
-a {
-  color: #337ab7;
-  text-decoration: none;
-}
-a:hover,
-a:focus {
-  text-decoration: none;
-  color: #23527c;
-}
 .error404 #site-content {
   padding-top: 4rem;
 }
@@ -148,4 +128,21 @@ a:focus {
 .error404 #site-content .search-form {
   justify-content: center;
   margin-top: 3rem;
+}
+.copyright {
+  background: #ffffff;
+  padding: 15px 15px 10px;
+}
+.copyright * {
+  color: #666666;
+  font-size: 12px;
+  line-height: 24px;
+}
+.copyright a,
+.copyright a:hover,
+.copyright a:focus {
+  color: #666666;
+}
+.copyright .fa-copyright {
+  font-size: 11px;
 }

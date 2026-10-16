@@ -1,7 +1,0 @@
-button:active,
-button:focus,
-a:active,
-a:focus,
-input:focus {
-  outline: none !important;
-}

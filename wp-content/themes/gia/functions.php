@@ -11,6 +11,7 @@ add_filter('use_block_editor_for_post', '__return_false', 10);
  */
 //require THEME_URL . '/inc/template-tags.php';
 require get_template_directory() . '/inc/post-types.php';
+require_once get_template_directory() . '/inc/class-gia-header-nav-walker.php';
 
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -90,10 +91,282 @@ function gia_register_styles() {
     wp_enqueue_style( 'carousel-css', THEME_URL . '/assets/css/owl.carousel.css', array(), $theme_version );
     wp_enqueue_style( 'stylesheet-css', THEME_URL . '/assets/css/all.css', array(), $theme_version );
     wp_enqueue_style( 'style-css', get_stylesheet_uri(), array(), $theme_version );
-    wp_enqueue_style( 'custom-css', THEME_URL . '/assets/css/custom.css', array());
     wp_enqueue_style( 'responsive-css', THEME_URL . '/assets/css/responsive.css', array());
+    wp_enqueue_style( 'gia-header-css', THEME_URL . '/assets/css/gia-header.css', array(), $theme_version );
 }
 add_action( 'wp_enqueue_scripts', 'gia_register_styles' );
+
+/**
+ * Add the theme font to Elementor's font selector.
+ *
+ * @param array $fonts Fonts registered with Elementor.
+ * @return array
+ */
+function gia_elementor_additional_fonts( $fonts ) {
+    $fonts['DINOT'] = 'system';
+    $fonts['DINOT-Regular'] = 'system';
+    $fonts['DINOT-Medium'] = 'system';
+    $fonts['DINOT-Black'] = 'system';
+
+    return $fonts;
+}
+add_filter( 'elementor/fonts/additional_fonts', 'gia_elementor_additional_fonts' );
+
+/**
+ * Register theme settings in the WordPress Customizer.
+ *
+ * @param WP_Customize_Manager $wp_customize WordPress Customizer manager.
+ */
+function gia_customize_register( $wp_customize ) {
+    $wp_customize->add_section(
+        'gia_theme_settings',
+        array(
+            'title'    => __( 'Theme Settings', 'gia' ),
+            'priority' => 160,
+        )
+    );
+
+    $wp_customize->add_setting(
+        'gia_footer_copyright',
+        array(
+            'default'           => 'General Insurance Association of Singapore {Y}. All rights reserved.',
+            'sanitize_callback' => 'sanitize_text_field',
+            'transport'         => 'refresh',
+        )
+    );
+
+    $wp_customize->add_control(
+        'gia_footer_copyright',
+        array(
+            'label'       => __( 'Footer Copyright Text', 'gia' ),
+            'description' => __( 'Use {Y} to display the current year.', 'gia' ),
+            'section'     => 'gia_theme_settings',
+            'type'        => 'text',
+        )
+    );
+
+    $wp_customize->add_setting(
+        'gia_header_linkedin_url',
+        array(
+            'default'           => 'https://www.linkedin.com/company/giasingapore',
+            'sanitize_callback' => 'esc_url_raw',
+            'transport'         => 'refresh',
+        )
+    );
+
+    $wp_customize->add_control(
+        'gia_header_linkedin_url',
+        array(
+            'label'       => __( 'GIA LinkedIn URL', 'gia' ),
+            'description' => __( 'Used by the main navigation mega menu.', 'gia' ),
+            'section'     => 'gia_theme_settings',
+            'type'        => 'url',
+        )
+    );
+}
+add_action( 'customize_register', 'gia_customize_register' );
+
+/**
+ * Return the current audience section from the request path.
+ *
+ * @return string
+ */
+function gia_header_current_audience() {
+    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
+    $request_path = wp_parse_url( $request_uri, PHP_URL_PATH );
+    $home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+
+    if ( is_string( $request_path ) && is_string( $home_path ) && '/' !== $home_path ) {
+        $home_path = trailingslashit( $home_path );
+
+        if ( 0 === strpos( $request_path, $home_path ) ) {
+            $request_path = '/' . substr( $request_path, strlen( $home_path ) );
+        }
+    }
+
+    if ( is_string( $request_path ) && preg_match( '#^/agents(?:/|\.html?$|$)#i', $request_path ) ) {
+        return 'agents';
+    }
+
+    if ( is_string( $request_path ) && preg_match( '#^/consumers(?:/|\.html?$|$)#i', $request_path ) ) {
+        return 'consumers';
+    }
+
+    return 'consumers';
+}
+
+/**
+ * Return the active top-level item assigned to the primary menu location.
+ *
+ * @return WP_Post|null
+ */
+function gia_header_get_active_primary_item() {
+    $locations = get_nav_menu_locations();
+
+    if ( empty( $locations['primary'] ) ) {
+        return null;
+    }
+
+    $items = wp_get_nav_menu_items( $locations['primary'] );
+
+    if ( ! is_array( $items ) ) {
+        return null;
+    }
+
+    $audience = gia_header_current_audience();
+    $audience_item = null;
+    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
+    $request_path = wp_parse_url( $request_uri, PHP_URL_PATH );
+    $home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+
+    if ( is_string( $request_path ) && is_string( $home_path ) && '/' !== $home_path ) {
+        $home_path = trailingslashit( $home_path );
+
+        if ( 0 === strpos( $request_path, $home_path ) ) {
+            $request_path = '/' . substr( $request_path, strlen( $home_path ) );
+        }
+    }
+
+    $request_path = is_string( $request_path ) ? untrailingslashit( strtolower( $request_path ) ) : '';
+    $normalized_home_path = is_string( $home_path ) ? untrailingslashit( strtolower( $home_path ) ) : '';
+    $active_item = null;
+    $active_path_length = -1;
+
+    foreach ( $items as $item ) {
+        if ( '0' !== (string) $item->menu_item_parent ) {
+            continue;
+        }
+
+        $title = strtolower( wp_strip_all_tags( $item->title ) );
+        $item_path = wp_parse_url( $item->url, PHP_URL_PATH );
+
+        if ( sanitize_title( $title ) === $audience || ( is_string( $item_path ) && false !== strpos( strtolower( $item_path ), '/' . $audience ) ) ) {
+            $audience_item = $item;
+        }
+
+        if ( ! is_string( $item_path ) ) {
+            continue;
+        }
+
+        $item_path = strtolower( $item_path );
+        if ( '' !== $normalized_home_path && 0 === strpos( $item_path, $normalized_home_path . '/' ) ) {
+            $item_path = substr( $item_path, strlen( $normalized_home_path ) );
+        }
+        $item_path = untrailingslashit( $item_path );
+
+        if (
+            '' !== $item_path &&
+            ( $request_path === $item_path || 0 === strpos( $request_path, trailingslashit( $item_path ) ) ) &&
+            strlen( $item_path ) > $active_path_length
+        ) {
+            $active_item = $item;
+            $active_path_length = strlen( $item_path );
+        }
+    }
+
+    return $active_item ? $active_item : $audience_item;
+}
+
+/**
+ * Match an expanded-menu group to the active primary menu item.
+ *
+ * @param array    $items Menu items.
+ * @param stdClass $args  Menu arguments.
+ * @return array
+ */
+function gia_header_filter_expanded_menu_items( $items, $args ) {
+    if ( empty( $args->gia_header_filter_active_parent ) || empty( $args->theme_location ) || 'expanded' !== $args->theme_location ) {
+        return $items;
+    }
+
+    $active_item = gia_header_get_active_primary_item();
+
+    if ( ! $active_item ) {
+        return array();
+    }
+
+    $active_key = sanitize_title( $active_item->title );
+    $expanded_roots = array();
+    $children_by_parent = array();
+
+    foreach ( $items as $item ) {
+        $parent_id = (int) $item->menu_item_parent;
+
+        if ( 0 === $parent_id ) {
+            $expanded_roots[] = $item;
+        } else {
+            $children_by_parent[ $parent_id ][] = $item;
+        }
+    }
+
+    $matching_root = null;
+    foreach ( $expanded_roots as $root ) {
+        if ( sanitize_title( $root->title ) === $active_key ) {
+            $matching_root = $root;
+            break;
+        }
+    }
+
+    if ( ! $matching_root ) {
+        $singular_key = preg_replace( '/s$/', '', $active_key );
+
+        foreach ( $expanded_roots as $root ) {
+            if ( preg_replace( '/s$/', '', sanitize_title( $root->title ) ) === $singular_key ) {
+                $matching_root = $root;
+                break;
+            }
+        }
+    }
+
+    if ( ! $matching_root ) {
+        return array();
+    }
+
+    $filtered_items = array();
+    $append_children = function ( $parent_id, $is_promoted = false ) use ( &$append_children, &$filtered_items, $children_by_parent ) {
+        if ( empty( $children_by_parent[ $parent_id ] ) ) {
+            return;
+        }
+
+        foreach ( $children_by_parent[ $parent_id ] as $child ) {
+            $filtered_child = clone $child;
+
+            if ( $is_promoted ) {
+                $filtered_child->menu_item_parent = '0';
+            }
+
+            $filtered_items[] = $filtered_child;
+            $append_children( (int) $child->ID );
+        }
+    };
+    $append_children( (int) $matching_root->ID, true );
+
+    return $filtered_items;
+}
+add_filter( 'wp_nav_menu_objects', 'gia_header_filter_expanded_menu_items', 10, 2 );
+
+/**
+ * Mark the active primary menu item.
+ *
+ * @param array    $classes   Existing menu item classes.
+ * @param WP_Post  $menu_item Menu item object.
+ * @param stdClass $args      Menu arguments.
+ * @return array
+ */
+function gia_header_audience_menu_classes( $classes, $menu_item, $args ) {
+    if ( empty( $args->theme_location ) || 'primary' !== $args->theme_location ) {
+        return $classes;
+    }
+
+    $active_item = gia_header_get_active_primary_item();
+
+    if ( $active_item && (int) $active_item->ID === (int) $menu_item->ID ) {
+        $classes[] = 'is-active';
+    }
+
+    return $classes;
+}
+add_filter( 'nav_menu_css_class', 'gia_header_audience_menu_classes', 10, 3 );
 
 
 /**
@@ -109,6 +382,7 @@ function gia_register_scripts() {
     wp_enqueue_script( 'matchHeight-js', THEME_URL . '/assets/js/jquery.matchHeight-min.js', array(), $theme_version );
     wp_enqueue_script( 'carousel-js', THEME_URL . '/assets/js/owl.carousel.min.js', array(), $theme_version );
     wp_enqueue_script( 'custom-js', THEME_URL . '/assets/js/custom.js', array());
+    wp_enqueue_script( 'gia-header-js', THEME_URL . '/assets/js/gia-header.js', array(), $theme_version, true );
     wp_script_add_data( 'async-js', 'async', true );
 
 }
@@ -121,8 +395,8 @@ add_action( 'wp_enqueue_scripts', 'gia_register_scripts' );
 function gia_menus() {
 
     $locations = array(
-        'primary'  => __( 'Desktop Top Menu', 'gia' ),
-        'expanded' => __( 'Desktop Main Menu', 'gia' ),
+        'primary'  => __( 'Main Menu Level 1', 'gia' ),
+        'expanded' => __( 'Main Menu Level 2 (grouped by Level 1)', 'gia' ),
         'mobile'   => __( 'Mobile Menu', 'gia' ),
         'footer'   => __( 'Footer Menu', 'gia' ),
         'social'   => __( 'Social Menu', 'gia' ),
