@@ -55,7 +55,7 @@
 										'depth'          => 0,
 										'fallback_cb'    => false,
 										'walker'         => new Gia_Header_Nav_Walker(),
-										'gia_header_mega' => false,
+										'gia_header_mega' => true,
 										'gia_header_filter_active_parent' => true,
 									)
 								);

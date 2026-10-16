@@ -121,7 +121,7 @@
 }
 
 .gia-nav__list--desktop > li {
-  position: relative;
+  position: static;
   display: flex;
   align-items: stretch;
   margin: 0;
