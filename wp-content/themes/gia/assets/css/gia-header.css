@@ -133,7 +133,7 @@
   width: 100%;
   align-items: stretch;
   justify-content: flex-end;
-  column-gap: 18px;
+  column-gap: 0;
 }
 
 .gia-nav__list--desktop > li {
@@ -148,7 +148,7 @@
   align-items: center;
   gap: 8px;
   min-height: 126px;
-  padding: 0 13px;
+  padding: 0 20px;
   color: #111;
   font-size: 18px;
   line-height: 1.3;

@@ -58,7 +58,9 @@ a {
 a:hover {
   color: #23527c;
 }
-
+.mod-text a {
+  color: #d86018;
+}
 em,
 i,
 q,
@@ -152,4 +154,11 @@ hr {
 }
 .copyright .fa-copyright {
   font-size: 11px;
+}
+ul.black-dot > li {
+  font-size: 16px;
+  line-height: 23px;
+  color: #000000;
+  font-family: "DINOT-Regular";
+  position: relative;
 }
