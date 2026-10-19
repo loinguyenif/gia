@@ -214,46 +214,46 @@ function gia_header_get_active_primary_item() {
         return null;
     }
 
+    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
+    $home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+    $normalized_home_path = is_string( $home_path ) ? untrailingslashit( strtolower( $home_path ) ) : '';
+    $normalize_path = function ( $url ) use ( $normalized_home_path ) {
+        $path = wp_parse_url( $url, PHP_URL_PATH );
+
+        if ( ! is_string( $path ) ) {
+            return '';
+        }
+
+        $path = strtolower( $path );
+
+        if (
+            '' !== $normalized_home_path &&
+            ( $path === $normalized_home_path || 0 === strpos( $path, $normalized_home_path . '/' ) )
+        ) {
+            $path = substr( $path, strlen( $normalized_home_path ) );
+        }
+
+        return untrailingslashit( $path );
+    };
+    $request_path = $normalize_path( $request_uri );
     $audience = gia_header_current_audience();
     $audience_item = null;
-    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : '/';
-    $request_path = wp_parse_url( $request_uri, PHP_URL_PATH );
-    $home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
-
-    if ( is_string( $request_path ) && is_string( $home_path ) && '/' !== $home_path ) {
-        $home_path = trailingslashit( $home_path );
-
-        if ( 0 === strpos( $request_path, $home_path ) ) {
-            $request_path = '/' . substr( $request_path, strlen( $home_path ) );
-        }
-    }
-
-    $request_path = is_string( $request_path ) ? untrailingslashit( strtolower( $request_path ) ) : '';
-    $normalized_home_path = is_string( $home_path ) ? untrailingslashit( strtolower( $home_path ) ) : '';
     $active_item = null;
     $active_path_length = -1;
+    $primary_items_by_title = array();
 
     foreach ( $items as $item ) {
         if ( '0' !== (string) $item->menu_item_parent ) {
             continue;
         }
 
-        $title = strtolower( wp_strip_all_tags( $item->title ) );
-        $item_path = wp_parse_url( $item->url, PHP_URL_PATH );
+        $title_key = sanitize_title( wp_strip_all_tags( $item->title ) );
+        $item_path = $normalize_path( $item->url );
+        $primary_items_by_title[ $title_key ] = $item;
 
-        if ( sanitize_title( $title ) === $audience || ( is_string( $item_path ) && false !== strpos( strtolower( $item_path ), '/' . $audience ) ) ) {
+        if ( $title_key === $audience || ( '' !== $item_path && ( '/' . $audience === $item_path || 0 === strpos( $item_path, '/' . $audience . '/' ) ) ) ) {
             $audience_item = $item;
         }
-
-        if ( ! is_string( $item_path ) ) {
-            continue;
-        }
-
-        $item_path = strtolower( $item_path );
-        if ( '' !== $normalized_home_path && 0 === strpos( $item_path, $normalized_home_path . '/' ) ) {
-            $item_path = substr( $item_path, strlen( $normalized_home_path ) );
-        }
-        $item_path = untrailingslashit( $item_path );
 
         if (
             '' !== $item_path &&
@@ -265,7 +265,67 @@ function gia_header_get_active_primary_item() {
         }
     }
 
-    return $active_item ? $active_item : $audience_item;
+    if ( $active_item ) {
+        return $active_item;
+    }
+
+    if ( ! empty( $locations['expanded'] ) ) {
+        $expanded_items = wp_get_nav_menu_items( $locations['expanded'] );
+
+        if ( is_array( $expanded_items ) ) {
+            $expanded_items_by_id = array();
+
+            foreach ( $expanded_items as $expanded_item ) {
+                $expanded_items_by_id[ (int) $expanded_item->ID ] = $expanded_item;
+            }
+
+            $active_expanded_root = null;
+            $expanded_path_length = -1;
+
+            foreach ( $expanded_items as $expanded_item ) {
+                $item_path = $normalize_path( $expanded_item->url );
+
+                if (
+                    '' === $item_path ||
+                    ( $request_path !== $item_path && 0 !== strpos( $request_path, trailingslashit( $item_path ) ) ) ||
+                    strlen( $item_path ) <= $expanded_path_length
+                ) {
+                    continue;
+                }
+
+                $root_item = $expanded_item;
+                $parent_id = (int) $root_item->menu_item_parent;
+                $parent_depth = 0;
+
+                while ( $parent_id && isset( $expanded_items_by_id[ $parent_id ] ) && $parent_depth < count( $expanded_items ) ) {
+                    $root_item = $expanded_items_by_id[ $parent_id ];
+                    $parent_id = (int) $root_item->menu_item_parent;
+                    ++$parent_depth;
+                }
+
+                $active_expanded_root = $root_item;
+                $expanded_path_length = strlen( $item_path );
+            }
+
+            if ( $active_expanded_root ) {
+                $root_key = sanitize_title( wp_strip_all_tags( $active_expanded_root->title ) );
+
+                if ( isset( $primary_items_by_title[ $root_key ] ) ) {
+                    return $primary_items_by_title[ $root_key ];
+                }
+
+                $singular_root_key = preg_replace( '/s$/', '', $root_key );
+
+                foreach ( $primary_items_by_title as $primary_title => $primary_item ) {
+                    if ( preg_replace( '/s$/', '', $primary_title ) === $singular_root_key ) {
+                        return $primary_item;
+                    }
+                }
+            }
+        }
+    }
+
+    return $audience_item;
 }
 
 /**
@@ -706,80 +766,259 @@ add_filter( 'get_custom_logo', 'gia_get_custom_logo' );
 
 
 function apat_breadcrumbs() {
-    $delimiter = '<span class="delimiter"> &nbsp / &nbsp </span>';
-    $home = __('Home', 'gia'); 
-    $before = '<span class="current">'; 
-    $after = '</span>'; 
-    if ( !is_home() && !is_front_page() || is_paged() ) {
-        echo '<ul id="breadcrumbs">';
-        global $post;
-        $homeLink = get_bloginfo('url');
-        echo '<a href="' . $homeLink . '">' . $home . '</a> ' . $delimiter . ' ';
-        if ( is_category() ) {
-            global $wp_query;
-            $cat_obj = $wp_query->get_queried_object();
-            $thisCat = $cat_obj->term_id;
-            $thisCat = get_category($thisCat);
-            $parentCat = get_category($thisCat->parent);
-            if ($thisCat->parent != 0) echo(get_category_parents($parentCat, TRUE, ' ' . $delimiter . ' '));
-            echo $before . single_cat_title('', false) . $after;
-        } 
-        elseif ( is_day() ) {
-            echo '<a href="' . get_year_link(get_the_time('Y')) . '">' . get_the_time('Y') . '</a> ' . $delimiter . ' ';
-            echo '<a href="' . get_month_link(get_the_time('Y'),get_the_time('m')) . '">' . get_the_time('F') . '</a> ' . $delimiter . ' ';
-            echo $before . get_the_time('d') . $after;
-        } elseif ( is_month() ) {
-            echo '<a href="' . get_year_link(get_the_time('Y')) . '">' . get_the_time('Y') . '</a> ' . $delimiter . ' ';
-            echo $before . get_the_time('F') . $after;
-        } elseif ( is_year() ) {
-            echo $before . get_the_time('Y') . $after;
-        } elseif ( is_single() && !is_attachment() ) {
-            if ( get_post_type() != 'post' ) {
-                $post_type = get_post_type_object(get_post_type());
-                $slug = $post_type->rewrite;
-                echo '<a href="' . $homeLink . '/' . $slug['slug'] . '/">' . $post_type->labels->singular_name . '</a> ' . $delimiter . ' ';
-                echo $before . get_the_title() . $after;
-            } else {
-                $cat = get_the_category(); $cat = $cat[0];
-                echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
-                echo $before . get_the_title() . $after;
-            }
-        } elseif ( !is_single() && !is_page() && get_post_type() != 'post' && !is_404() ) {
-            $post_type = get_post_type_object(get_post_type());
-            echo $before . $post_type->labels->singular_name . $after;
-        } elseif ( is_attachment() ) {
-            $parent = get_post($post->post_parent);
-            $cat = get_the_category($parent->ID); $cat = $cat[0];
-            echo get_category_parents($cat, TRUE, ' ' . $delimiter . ' ');
-            echo '<a href="' . get_permalink($parent) . '">' . $parent->post_title . '</a> ' . $delimiter . ' ';
-            echo $before . get_the_title() . $after;
-        } elseif ( is_page() && !$post->post_parent ) {
-            echo $before . get_the_title() . $after;
-        } elseif ( is_page() && $post->post_parent ) {
-            $parent_id = $post->post_parent;
-            $breadcrumbs = array();
-            while ($parent_id) {
-                $page = get_page($parent_id);
-                $breadcrumbs[] = '<a href="' . get_permalink($page->ID) . '">' . get_the_title($page->ID) . '</a>';
-                $parent_id = $page->post_parent;
-            }
-            $breadcrumbs = array_reverse($breadcrumbs);
-            foreach ($breadcrumbs as $crumb) echo $crumb . ' ' . $delimiter . ' ';
-            echo $before . get_the_title() . $after;
-        } elseif ( is_search() ) {
-            echo $before . __('Search results for ', 'gia') . get_search_query() . '"' . $after;
-        } elseif ( is_tag() ) {
-            echo $before .  __('Posts tagged ', 'gia') . single_tag_title('', false) . '"' . $after;
-        } elseif ( is_author() ) {
-            global $author;
-            echo $before . __('Articles posted by ', 'gia') . $userdata->display_name . $after;
-        } elseif ( is_404() ) {
-            echo $before . __('Error 404', 'gia') . $after;
-        }
-        echo '</ul>';
+    if ( ( is_home() || is_front_page() ) && ! is_paged() ) {
+        return '';
     }
+
+    $normalize_path = function ( $url ) {
+        $path = wp_parse_url( $url, PHP_URL_PATH );
+        $home_path = wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+
+        if ( ! is_string( $path ) ) {
+            return '';
+        }
+
+        $path = strtolower( rawurldecode( $path ) );
+        $home_path = is_string( $home_path ) ? untrailingslashit( strtolower( rawurldecode( $home_path ) ) ) : '';
+
+        if (
+            '' !== $home_path &&
+            ( $path === $home_path || 0 === strpos( $path, $home_path . '/' ) )
+        ) {
+            $path = substr( $path, strlen( $home_path ) );
+        }
+
+        return untrailingslashit( $path );
+    };
+    $request_uri = isset( $_SERVER['REQUEST_URI'] ) ? wp_unslash( $_SERVER['REQUEST_URI'] ) : home_url( '/' );
+    $request_path = $normalize_path( $request_uri );
+    $current_id = get_queried_object_id();
+    $current_title = '';
+
+    if ( is_search() ) {
+        $current_title = sprintf(
+            /* translators: %s: Search query. */
+            __( 'Search results for: %s', 'gia' ),
+            get_search_query()
+        );
+    } elseif ( is_404() ) {
+        $current_title = __( 'Error 404', 'gia' );
+    } elseif ( is_category() || is_tag() || is_tax() ) {
+        $queried_term = get_queried_object();
+        $current_title = isset( $queried_term->name ) ? $queried_term->name : '';
+    } elseif ( is_post_type_archive() ) {
+        $archive_post_type = get_query_var( 'post_type' );
+        if ( is_array( $archive_post_type ) ) {
+            $archive_post_type = reset( $archive_post_type );
+        }
+        $post_type_object = $archive_post_type ? get_post_type_object( $archive_post_type ) : null;
+        $current_title = $post_type_object ? $post_type_object->labels->name : '';
+    } elseif ( is_author() ) {
+        $current_title = get_the_author_meta( 'display_name', get_queried_object_id() );
+    } elseif ( is_year() ) {
+        $current_title = get_the_time( 'Y' );
+    } elseif ( is_month() ) {
+        $current_title = get_the_time( 'F Y' );
+    } elseif ( is_day() ) {
+        $current_title = get_the_time( 'F j, Y' );
+    } elseif ( $current_id ) {
+        $current_title = get_the_title( $current_id );
+    }
+
+    $crumbs = array();
+    $menu_match_found = false;
+    $menu_locations = get_nav_menu_locations();
+    $active_primary = gia_header_get_active_primary_item();
+
+    if ( ! empty( $menu_locations['primary'] ) ) {
+        $primary_items = wp_get_nav_menu_items( $menu_locations['primary'] );
+
+        if ( is_array( $primary_items ) ) {
+            foreach ( $primary_items as $primary_item ) {
+                if (
+                    '0' === (string) $primary_item->menu_item_parent &&
+                    $active_primary &&
+                    (int) $primary_item->ID === (int) $active_primary->ID
+                ) {
+                    $crumbs[] = array(
+                        'title' => $primary_item->title,
+                        'url'   => $primary_item->url,
+                    );
+                    $menu_match_found = $request_path === $normalize_path( $primary_item->url );
+                    break;
+                }
+            }
+        }
+    }
+
+    if ( ! empty( $menu_locations['expanded'] ) ) {
+        $expanded_items = wp_get_nav_menu_items( $menu_locations['expanded'] );
+
+        if ( is_array( $expanded_items ) ) {
+            $expanded_items_by_id = array();
+            $best_match = null;
+            $best_match_path_length = -1;
+            $best_match_depth = -1;
+
+            foreach ( $expanded_items as $expanded_item ) {
+                $expanded_items_by_id[ (int) $expanded_item->ID ] = $expanded_item;
+            }
+
+            foreach ( $expanded_items as $expanded_item ) {
+                $item_path = $normalize_path( $expanded_item->url );
+                $item_depth = 0;
+                $parent_id = (int) $expanded_item->menu_item_parent;
+                $parent_depth = 0;
+
+                while ( $parent_id && isset( $expanded_items_by_id[ $parent_id ] ) && $parent_depth < count( $expanded_items ) ) {
+                    $parent_item = $expanded_items_by_id[ $parent_id ];
+                    ++$item_depth;
+                    $parent_id = (int) $parent_item->menu_item_parent;
+                    ++$parent_depth;
+                }
+
+                if (
+                    '' === $item_path ||
+                    ( $request_path !== $item_path && 0 !== strpos( $request_path, trailingslashit( $item_path ) ) ) ||
+                    strlen( $item_path ) < $best_match_path_length ||
+                    ( strlen( $item_path ) === $best_match_path_length && $item_depth <= $best_match_depth )
+                ) {
+                    continue;
+                }
+
+                $best_match = $expanded_item;
+                $best_match_path_length = strlen( $item_path );
+                $best_match_depth = $item_depth;
+            }
+
+            if ( $best_match ) {
+                $menu_chain = array();
+                $parent_id = (int) $best_match->ID;
+                $parent_depth = 0;
+
+                while ( $parent_id && isset( $expanded_items_by_id[ $parent_id ] ) && $parent_depth < count( $expanded_items ) ) {
+                    $menu_item = $expanded_items_by_id[ $parent_id ];
+                    array_unshift( $menu_chain, $menu_item );
+                    $parent_id = (int) $menu_item->menu_item_parent;
+                    ++$parent_depth;
+                }
+
+                foreach ( $menu_chain as $index => $menu_item ) {
+                    if (
+                        0 === $index &&
+                        $active_primary &&
+                        sanitize_title( $menu_item->title ) === sanitize_title( $active_primary->title )
+                    ) {
+                        continue;
+                    }
+
+                    $crumbs[] = array(
+                        'title' => $menu_item->title,
+                        'url'   => $menu_item->url,
+                    );
+                }
+
+                $best_match_path = $normalize_path( $best_match->url );
+                $menu_match_found = $menu_match_found || $request_path === $best_match_path;
+            }
+        }
+    }
+
+    if ( ! $menu_match_found && $current_title ) {
+        if ( is_page() && $current_id ) {
+            $page_ancestors = array_reverse( get_post_ancestors( $current_id ) );
+
+            foreach ( $page_ancestors as $ancestor_id ) {
+                $ancestor_title = get_the_title( $ancestor_id );
+                $last_crumb = empty( $crumbs ) ? null : end( $crumbs );
+
+                if ( ! $last_crumb || sanitize_title( $last_crumb['title'] ) !== sanitize_title( $ancestor_title ) ) {
+                    $crumbs[] = array(
+                        'title' => $ancestor_title,
+                        'url'   => get_permalink( $ancestor_id ),
+                    );
+                }
+            }
+        } elseif ( is_single() && 'post' === get_post_type() ) {
+            $categories = get_the_category( $current_id );
+
+            if ( ! empty( $categories ) ) {
+                $category = reset( $categories );
+                $category_ancestors = array_reverse( get_ancestors( $category->term_id, 'category' ) );
+
+                foreach ( $category_ancestors as $ancestor_id ) {
+                    $ancestor = get_category( $ancestor_id );
+                    if ( $ancestor && ! is_wp_error( $ancestor ) ) {
+                        $crumbs[] = array(
+                            'title' => $ancestor->name,
+                            'url'   => get_category_link( $ancestor->term_id ),
+                        );
+                    }
+                }
+
+                $crumbs[] = array(
+                    'title' => $category->name,
+                    'url'   => get_category_link( $category->term_id ),
+                );
+            }
+        }
+
+        $current_url = '';
+
+        if ( $current_id && is_singular() ) {
+            $current_url = get_permalink( $current_id );
+        } elseif ( is_category() || is_tag() || is_tax() ) {
+            $queried_term = get_queried_object();
+            $term_url = $queried_term ? get_term_link( $queried_term ) : '';
+            $current_url = is_wp_error( $term_url ) ? '' : $term_url;
+        }
+
+        $crumbs[] = array(
+            'title' => $current_title,
+            'url'   => $current_url,
+        );
+    }
+
+    if ( is_paged() ) {
+        $crumbs[] = array(
+            'title' => sprintf(
+                /* translators: %s: Page number. */
+                __( 'Page %s', 'gia' ),
+                number_format_i18n( get_query_var( 'paged' ) )
+            ),
+            'url'   => '',
+        );
+    }
+
+    if ( empty( $crumbs ) ) {
+        return '';
+    }
+
+    $output = '<ul id="breadcrumbs"><li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'gia' ) . '</a></li>';
+
+    foreach ( $crumbs as $index => $crumb ) {
+        $is_current = $index === count( $crumbs ) - 1;
+        $output .= '<li><span class="delimiter"> &nbsp;/&nbsp; </span>';
+
+        if ( $is_current ) {
+            $output .= '<span class="current">' . esc_html( $crumb['title'] ) . '</span>';
+        } elseif ( ! empty( $crumb['url'] ) ) {
+            $output .= '<a href="' . esc_url( $crumb['url'] ) . '">' . esc_html( $crumb['title'] ) . '</a>';
+        } else {
+            $output .= '<span>' . esc_html( $crumb['title'] ) . '</span>';
+        }
+
+        $output .= '</li>';
+    }
+
+    return $output . '</ul>';
 }
 add_shortcode( 'apat_breadcrumbs', 'apat_breadcrumbs');
+
+
+function apat_searchform() {
+}
+add_shortcode( 'apat_searchform', 'apat_searchform');
 
 function more_post_ajax(){
     $ppp = (isset($_POST["ppp"])) ? $_POST["ppp"] : 9;

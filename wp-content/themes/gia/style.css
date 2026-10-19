@@ -162,3 +162,52 @@ ul.black-dot > li {
   font-family: "DINOT-Regular";
   position: relative;
 }
+#breadcrumbs {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  list-style: none;
+  margin: 0 15px;
+  padding: 0;
+}
+#breadcrumbs li {
+  display: inline-flex;
+  align-items: center;
+}
+#breadcrumbs a,
+#breadcrumbs span {
+  color: #666666;
+  text-align: center;
+  font-size: 13px;
+  transition: color 0.3s ease-in-out;
+}
+#breadcrumbs a {
+  cursor: pointer;
+  pointer-events: auto;
+}
+#breadcrumbs span {
+  cursor: default;
+  pointer-events: none;
+}
+
+#searchform #s {
+  height: 70px;
+  background: #fff;
+  width: 100%;
+  border: none;
+  box-shadow: none;
+  padding-left: 15px;
+  border-left: 8px solid #d86018;
+  font-size: 16px;
+  color: #666666;
+  z-index: 200;
+}
+#searchform #searchsubmit {
+  position: absolute;
+  right: 0px;
+  top: -70px;
+  height: 70px;
+  width: 70px;
+  background: #000;
+  border-radius: 0px;
+}
