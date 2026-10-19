@@ -683,6 +683,15 @@ function gia_register_scripts() {
     wp_enqueue_script( 'matchHeight-js', THEME_URL . '/assets/js/jquery.matchHeight-min.js', array(), $theme_version );
     wp_enqueue_script( 'carousel-js', THEME_URL . '/assets/js/owl.carousel.min.js', array(), $theme_version );
     wp_enqueue_script( 'custom-js', THEME_URL . '/assets/js/custom.js', array());
+    wp_localize_script(
+        'custom-js',
+        'giaOtherInsurance',
+        array(
+            'ajaxUrl'                   => admin_url( 'admin-ajax.php' ),
+            'nonce'                     => wp_create_nonce( 'gia_load_more_insurance' ),
+            'managementCommitteeNonce' => wp_create_nonce( 'gia_load_more_management_committee' ),
+        )
+    );
     wp_enqueue_script( 'gia-header-js', THEME_URL . '/assets/js/gia-header.js', array(), $theme_version, true );
     wp_script_add_data( 'async-js', 'async', true );
 
@@ -1024,6 +1033,306 @@ function apat_searchform() {
 }
 add_shortcode( 'apat_searchform', 'apat_searchform');
 
+
+function gia_other_insurance_category_id( $category ) {
+    if ( is_numeric( $category ) ) {
+        $term = get_term( absint( $category ), 'category' );
+
+        return ( $term && ! is_wp_error( $term ) ) ? (int) $term->term_id : 0;
+    }
+
+    $term = get_category_by_slug( sanitize_title( $category ) );
+
+    return $term ? (int) $term->term_id : 0;
+}
+
+function gia_render_other_insurance_item( $post_id ) {
+    $title = get_the_title( $post_id );
+    $image = get_the_post_thumbnail(
+        $post_id,
+        'large',
+        array(
+            'class' => 'gia-other-insurance__image',
+            'alt'   => $title,
+        )
+    );
+
+    if ( ! $image ) {
+        $image = '<div class="gia-other-insurance__image-placeholder" aria-hidden="true"></div>';
+    }
+
+    $excerpt = wp_trim_words( get_the_excerpt( $post_id ), 48, '...' );
+
+    return '<article class="gia-other-insurance__item">'
+        . '<div class="gia-other-insurance__media">' . $image . '</div>'
+        . '<div class="gia-other-insurance__content">'
+        . '<h3 class="gia-other-insurance__title">' . esc_html( $title ) . '</h3>'
+        . '<p class="gia-other-insurance__excerpt">' . esc_html( $excerpt ) . '</p>'
+        . '<a class="gia-other-insurance__read-more" href="' . esc_url( get_permalink( $post_id ) ) . '">'
+        . esc_html__( 'Read More', 'gia' )
+        . '</a></div></article>';
+}
+
+function apat_other_types_of_insurance( $atts ) {
+    $atts = shortcode_atts(
+        array(
+            'category' => 'other-types-of-insurance',
+        ),
+        $atts,
+        'apat_other_types_of_insurance'
+    );
+    $category_id = gia_other_insurance_category_id( $atts['category'] );
+
+    if ( ! $category_id ) {
+        return '<p class="gia-other-insurance__error" role="alert">'
+            . esc_html__( 'Insurance category not found. Check the shortcode category attribute.', 'gia' )
+            . '</p>';
+    }
+
+    $query = new WP_Query(
+        array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => 3,
+            'paged'               => 1,
+            'cat'                 => $category_id,
+            'ignore_sticky_posts' => true,
+        )
+    );
+
+    if ( ! $query->have_posts() ) {
+        wp_reset_postdata();
+        return '';
+    }
+
+    $items = '';
+    while ( $query->have_posts() ) {
+        $query->the_post();
+        $items .= gia_render_other_insurance_item( get_the_ID() );
+    }
+    wp_reset_postdata();
+
+    $output  = '<div class="gia-other-insurance" data-category="' . esc_attr( $category_id ) . '" data-page="1">';
+    $output .= '<div class="gia-other-insurance__items">' . $items . '</div>';
+
+    if ( $query->max_num_pages > 1 ) {
+        $output .= '<button class="gia-other-insurance__load-more" type="button">'
+            . esc_html__( 'Load More', 'gia' )
+            . '</button>';
+    }
+
+    return $output . '</div>';
+}
+add_shortcode( 'apat_other_types_of_insurance', 'apat_other_types_of_insurance');
+
+function load_more_types_of_insurance_ajax() {
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+    if ( ! wp_verify_nonce( $nonce, 'gia_load_more_insurance' ) ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Your session has expired. Please reload the page.', 'gia' ) ),
+            403
+        );
+    }
+
+    $category_id = isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0;
+    $page        = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 0;
+
+    if ( ! gia_other_insurance_category_id( $category_id ) || $page < 2 ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Unable to load more posts.', 'gia' ) ),
+            400
+        );
+    }
+
+    $query = new WP_Query(
+        array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => 3,
+            'paged'               => $page,
+            'cat'                 => $category_id,
+            'ignore_sticky_posts' => true,
+        )
+    );
+
+    $items = '';
+    while ( $query->have_posts() ) {
+        $query->the_post();
+        $items .= gia_render_other_insurance_item( get_the_ID() );
+    }
+    wp_reset_postdata();
+
+    wp_send_json_success(
+        array(
+            'html'     => $items,
+            'has_more' => $query->max_num_pages > $page,
+        )
+    );
+}
+add_action('wp_ajax_nopriv_load_more_types_of_insurance_ajax', 'load_more_types_of_insurance_ajax');
+add_action('wp_ajax_load_more_types_of_insurance_ajax', 'load_more_types_of_insurance_ajax');
+
+
+function gia_render_management_committee_items( $query ) {
+    $output = '';
+    $index  = 0;
+
+    while ( $query->have_posts() ) {
+        $query->the_post();
+
+        if ( 0 === $index % 5 ) {
+            $output .= '<div class="gia-committee__row">';
+        }
+
+        $post_id = get_the_ID();
+        $title   = get_the_title( $post_id );
+        $image   = get_the_post_thumbnail(
+            $post_id,
+            'medium',
+            array(
+                'class' => 'gia-committee__image',
+                'alt'   => $title,
+            )
+        );
+
+        if ( ! $image ) {
+            $image = '<span class="gia-committee__image-placeholder" aria-hidden="true"></span>';
+        }
+
+        $content = apply_filters( 'the_content', get_post_field( 'post_content', $post_id ) );
+
+        $output .= '<article class="gia-committee__item">'
+            . '<button class="gia-committee__card" type="button" aria-expanded="false">'
+            . $image
+            . '<span class="gia-committee__name">' . esc_html( $title ) . '</span>'
+            . '</button>'
+            . '<template class="gia-committee__detail-source">'
+            . '<div class="gia-committee__detail-image">' . $image . '</div>'
+            . '<div class="gia-committee__detail-copy">'
+            . '<h3 class="gia-committee__detail-title">' . esc_html( $title ) . '</h3>'
+            . '<div class="gia-committee__detail-content">' . wp_kses_post( $content ) . '</div>'
+            . '</div></template></article>';
+
+        if ( 4 === $index % 5 || $index === $query->post_count - 1 ) {
+            $output .= '<div class="gia-committee__detail-panel" hidden>'
+                . '<button class="gia-committee__close" type="button" aria-label="' . esc_attr__( 'Close details', 'gia' ) . '">&times;</button>'
+                . '<div class="gia-committee__detail-panel-content"></div></div></div>';
+        }
+
+        ++$index;
+    }
+
+    wp_reset_postdata();
+
+    return $output;
+}
+
+function apat_management_committee( $atts ) {
+    $atts = shortcode_atts(
+        array(
+            'cat_id' => 9,
+            'limit'  => 10,
+        ),
+        $atts,
+        'apat_management_committee'
+    );
+    $category_id = absint( $atts['cat_id'] );
+    $limit       = absint( $atts['limit'] );
+    $limit       = min( 50, $limit ? $limit : 10 );
+
+    if ( ! $category_id || ! term_exists( $category_id, 'category' ) ) {
+        return '<p class="gia-committee__error" role="alert">'
+            . esc_html__( 'Management committee category not found.', 'gia' )
+            . '</p>';
+    }
+
+    $query = new WP_Query(
+        array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => $limit,
+            'paged'               => 1,
+            'cat'                 => $category_id,
+            'orderby'             => array(
+                'menu_order' => 'ASC',
+                'date'       => 'DESC',
+            ),
+            'ignore_sticky_posts' => true,
+        )
+    );
+
+    if ( ! $query->have_posts() ) {
+        wp_reset_postdata();
+        return '';
+    }
+
+    $items = gia_render_management_committee_items( $query );
+    $committee_class = 9 === $category_id ? ' gia-committee--management' : '';
+    $output = '<div class="gia-committee' . esc_attr( $committee_class ) . '" data-category="' . esc_attr( $category_id ) . '" data-limit="' . esc_attr( $limit ) . '" data-page="1">'
+        . '<div class="gia-committee__rows">' . $items . '</div>';
+
+    if ( $query->max_num_pages > 1 ) {
+        $output .= '<button class="gia-committee__load-more" type="button">'
+            . esc_html__( 'Load More', 'gia' )
+            . '</button>';
+    }
+
+    return $output . '</div>';
+}
+add_shortcode( 'apat_management_committee', 'apat_management_committee');
+
+
+function load_more_management_committee_ajax() {
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+    if ( ! wp_verify_nonce( $nonce, 'gia_load_more_management_committee' ) ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Your session has expired. Please reload the page.', 'gia' ) ),
+            403
+        );
+    }
+
+    $category_id = isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0;
+    $limit       = isset( $_POST['limit'] ) ? absint( $_POST['limit'] ) : 10;
+    $limit       = min( 50, $limit ? $limit : 10 );
+    $page        = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 0;
+
+    if ( ! $category_id || ! term_exists( $category_id, 'category' ) || $page < 2 || $page > 100 ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Unable to load more committee members.', 'gia' ) ),
+            400
+        );
+    }
+
+    $query = new WP_Query(
+        array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => $limit,
+            'paged'               => $page,
+            'cat'                 => $category_id,
+            'orderby'             => array(
+                'menu_order' => 'ASC',
+                'date'       => 'DESC',
+            ),
+            'ignore_sticky_posts' => true,
+        )
+    );
+
+    $items = gia_render_management_committee_items( $query );
+
+    wp_send_json_success(
+        array(
+            'html'     => $items,
+            'has_more' => $query->max_num_pages > $page,
+        )
+    );
+}
+add_action('wp_ajax_nopriv_load_more_management_committee_ajax', 'load_more_management_committee_ajax');
+add_action('wp_ajax_load_more_management_committee_ajax', 'load_more_management_committee_ajax');
+
+
 function more_post_ajax(){
     $ppp = (isset($_POST["ppp"])) ? $_POST["ppp"] : 9;
     $page = (isset($_POST['pageNumber'])) ? $_POST['pageNumber'] : 0;
@@ -1096,6 +1405,10 @@ function more_post_ajax(){
 
 add_action('wp_ajax_nopriv_more_post_ajax', 'more_post_ajax');
 add_action('wp_ajax_more_post_ajax', 'more_post_ajax');
+
+
+
+
 
 
 function filter_product(){
@@ -1273,19 +1586,3 @@ function get_post_loadmore() {
 }
 add_action('wp_ajax_loadmore', 'get_post_loadmore');
 add_action('wp_ajax_nopriv_loadmore', 'get_post_loadmore');
-
-
-function add_search_form($items, $args) {
-          if( $args->menu == 'main-menu' ){
-          $items .= '<li class="menu-item d-flex justify-content-between align-items-center d-sm-none search-box-mb menu-item menu-item-type-taxonomy menu-item-object-category">'
-                  . '<form role="search" method="get" class="search-form-mb" action="'.home_url( '/' ).'">'
-                  . '<label>'
-                  . '<span class="screen-reader-text">' . _x( 'Search for:', 'label' ) . '</span>'
-                  . '<input type="search" class="search-field" placeholder="' . esc_attr_x( 'Search Keywords', 'placeholder' ) . '" value="' . get_search_query() . '" name="s" title="' . esc_attr_x( 'Search for:', 'label' ) . '" />'
-                  . '</label>'
-                  . '<button type="submit" class="search-submit" value="'. esc_attr_x('Search', 'submit button') .'"><i class="far fa-search"></i></button>'
-                  . '</form>'
-                  . '</li>';
-          }
-        return $items;
-}      

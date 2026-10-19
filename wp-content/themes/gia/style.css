@@ -138,6 +138,12 @@ hr {
   justify-content: center;
   margin-top: 3rem;
 }
+
+.container {
+  width: min(1160px, calc(100% - 48px));
+  max-width: none;
+  padding: 0;
+}
 .copyright {
   background: #ffffff;
   padding: 15px 15px 10px;
@@ -167,7 +173,7 @@ ul.black-dot > li {
   flex-wrap: wrap;
   align-items: center;
   list-style: none;
-  margin: 0 15px;
+  margin: 0;
   padding: 0;
 }
 #breadcrumbs li {
@@ -219,4 +225,626 @@ ul.black-dot > li {
   border-radius: 0;
   color: #fff;
   cursor: pointer;
+}
+
+.gia-other-insurance {
+  width: 100%;
+}
+.gia-other-insurance__items {
+  display: grid;
+  gap: 32px;
+}
+.gia-other-insurance__item {
+  display: flex;
+  min-height: 264px;
+  border: 1px solid #d5d5d5;
+}
+.gia-other-insurance__media {
+  flex: 0 0 33.333%;
+  min-height: 264px;
+  background: #f4f4f4;
+}
+.gia-other-insurance__image,
+.gia-other-insurance__image-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 264px;
+  object-fit: cover;
+}
+.gia-other-insurance__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 26px 0 0 46px;
+}
+.gia-other-insurance__title {
+  margin: 0 20px 18px 0;
+  color: #d86018;
+  font-family: "DINOT";
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+.gia-other-insurance__excerpt {
+  display: -webkit-box;
+  overflow: hidden;
+  margin: 0 28px 20px 0;
+  color: #111;
+  font-size: 16px;
+  line-height: 1.75;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+}
+.gia-other-insurance__read-more {
+  align-self: flex-end;
+  min-width: 150px;
+  margin-top: auto;
+  padding: 10px 24px;
+  background: #d86018;
+  color: #fff;
+  font-family: "DINOT";
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+  text-align: center;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+.gia-other-insurance__read-more:hover,
+.gia-other-insurance__read-more:focus {
+  background: #b94f13;
+  color: #fff;
+}
+.gia-other-insurance__load-more {
+  display: block;
+  width: min(60%, 704px);
+  min-height: 46px;
+  margin: 78px auto 0;
+  border: 2px solid #e2e6eb;
+  border-radius: 24px;
+  background: #fff;
+  color: #777;
+  cursor: pointer;
+  font-family: "DINOT-Regular";
+  font-size: 14px;
+}
+.gia-other-insurance__load-more:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.gia-other-insurance__error {
+  margin: 20px 0 0;
+  color: #b00020;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .gia-other-insurance__item {
+    flex-direction: column;
+  }
+  .gia-other-insurance__media {
+    flex-basis: auto;
+    min-height: 220px;
+  }
+  .gia-other-insurance__image,
+  .gia-other-insurance__image-placeholder {
+    height: 220px;
+    min-height: 220px;
+  }
+  .gia-other-insurance__content {
+    min-height: 220px;
+    padding: 22px 0 0 22px;
+  }
+  .gia-other-insurance__load-more {
+    width: 100%;
+    margin-top: 48px;
+  }
+}
+
+.gia-committee {
+  width: 100%;
+}
+.gia-committee__rows {
+  display: grid;
+  gap: 24px;
+}
+.gia-committee__row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  column-gap: 10px;
+  row-gap: 24px;
+  align-items: start;
+}
+.gia-committee__item {
+  min-width: 0;
+  text-align: center;
+  transition: opacity 0.2s ease;
+}
+.gia-committee__card {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #111;
+  cursor: pointer;
+  font: inherit;
+  text-align: center;
+}
+.gia-committee__image,
+.gia-committee__image-placeholder {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin: 0 0 10px;
+  background: #eee;
+  object-fit: cover;
+}
+.gia-committee__name {
+  display: block;
+  padding: 0 8px;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.gia-committee__card:hover .gia-committee__name,
+.gia-committee__card:focus-visible .gia-committee__name,
+.gia-committee__card.is-active .gia-committee__name {
+  color: #d86018;
+}
+.gia-committee__card,
+.gia-committee__card:hover,
+.gia-committee__card:active,
+.gia-committee__card:focus,
+.gia-committee__card:focus-visible {
+  border: 0;
+  outline: none;
+  box-shadow: none;
+}
+.gia-committee__detail-panel[hidden] {
+  display: none;
+}
+.gia-committee__detail-panel {
+  position: relative;
+  grid-column: 1 / -1;
+  min-height: 270px;
+  margin-top: 18px;
+  padding: 34px 16px;
+  background: #e5e5e5;
+}
+.gia-committee__detail-panel-content {
+  display: flex;
+  gap: 30px;
+  align-items: flex-start;
+}
+.gia-committee__detail-image {
+  flex: 0 0 255px;
+}
+.gia-committee__detail-image .gia-committee__image,
+.gia-committee__detail-image .gia-committee__image-placeholder {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin: 0;
+  object-fit: cover;
+}
+.gia-committee__detail-copy {
+  flex: 1;
+  min-width: 0;
+  padding-top: 12px;
+}
+.gia-committee__detail-title {
+  margin: 0 0 18px;
+  color: #111;
+  font-family: "DINOT-Regular";
+  font-size: 22px;
+  font-weight: 400;
+  line-height: 1.4;
+}
+.gia-committee__detail-content,
+.gia-committee__detail-content p {
+  color: #111;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.gia-committee__detail-content > :last-child {
+  margin-bottom: 0;
+}
+.gia-committee__close {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #333;
+  cursor: pointer;
+  font-size: 28px;
+  line-height: 1;
+}
+.gia-committee__item.is-muted {
+  opacity: 0.35;
+}
+.gia-committee__load-more {
+  display: block;
+  width: min(60%, 704px);
+  min-height: 46px;
+  margin: 56px auto 0;
+  border: 2px solid #e2e6eb;
+  border-radius: 24px;
+  background: #fff;
+  color: #777;
+  cursor: pointer;
+  font-family: "DINOT-Regular";
+  font-size: 14px;
+}
+.gia-committee__load-more:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.gia-committee__error {
+  margin: 20px 0;
+  color: #b00020;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .gia-committee__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+    row-gap: 20px;
+  }
+  .gia-committee__name {
+    padding: 0 4px;
+    font-size: 14px;
+  }
+  .gia-committee__detail-panel {
+    padding: 48px 16px 22px;
+  }
+  .gia-committee__detail-panel-content {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .gia-committee__detail-image {
+    flex-basis: auto;
+    width: min(100%, 255px);
+  }
+  .gia-committee__detail-copy {
+    padding-top: 0;
+  }
+  .gia-committee__detail-title {
+    font-size: 19px;
+  }
+  .gia-committee__load-more {
+    width: 100%;
+  }
+}
+
+.gia-committee--management .gia-committee__rows {
+  gap: 40px;
+}
+.gia-committee--management .gia-committee__row {
+  max-width: 1000px;
+  margin-right: auto;
+  margin-left: auto;
+  column-gap: 10px;
+  row-gap: 24px;
+}
+.gia-committee--management .gia-committee__image,
+.gia-committee--management .gia-committee__image-placeholder {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1 / 1;
+  margin-bottom: 10px;
+  object-fit: cover;
+}
+.gia-committee--management .gia-committee__name {
+  min-height: 104px;
+  padding: 0 8px;
+  font-size: 15px;
+  line-height: 24px;
+}
+.gia-committee--management .gia-committee__item.is-muted {
+  opacity: 0.35;
+}
+.gia-committee--management .gia-committee__detail-panel {
+  width: min(1172px, calc(100vw - 40px));
+  max-width: none;
+  min-height: 353px;
+  margin-top: 18px;
+  margin-left: 50%;
+  padding: 44px 16px;
+  box-sizing: border-box;
+  transform: translateX(-50%);
+}
+.gia-committee--management .gia-committee__detail-panel::before {
+  position: absolute;
+  top: -16px;
+  left: var(--gia-committee-pointer-x, 33%);
+  width: 0;
+  height: 0;
+  border-right: 16px solid transparent;
+  border-bottom: 16px solid #e5e5e5;
+  border-left: 16px solid transparent;
+  content: "";
+  transform: translateX(-50%);
+}
+.gia-committee--management .gia-committee__detail-image {
+  flex: 0 0 263px;
+}
+.gia-committee--management .gia-committee__detail-image .gia-committee__image,
+.gia-committee--management
+  .gia-committee__detail-image
+  .gia-committee__image-placeholder {
+  width: 263px;
+  height: 264px;
+  min-height: 0;
+  aspect-ratio: auto;
+  margin: 0;
+  object-fit: cover;
+}
+.gia-committee--management .gia-committee__detail-copy {
+  padding-top: 20px;
+}
+.gia-committee--management .gia-committee__detail-title {
+  margin: 0 0 18px;
+  font-family: "DINOT-Regular";
+  font-size: 22px;
+  line-height: 1.4;
+}
+.gia-committee--management .gia-committee__detail-content,
+.gia-committee--management .gia-committee__detail-content p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+@media (max-width: 767px) {
+  .gia-committee--management .gia-committee__row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 12px;
+  }
+  .gia-committee--management .gia-committee__name {
+    min-height: 0;
+    padding: 0 4px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .gia-committee--management .gia-committee__detail-panel {
+    width: calc(100vw - 32px);
+    min-height: 0;
+    padding: 48px 16px 22px;
+  }
+  .gia-committee--management .gia-committee__detail-panel-content {
+    flex-direction: column;
+    gap: 18px;
+  }
+  .gia-committee--management .gia-committee__detail-image {
+    flex: 0 0 auto;
+    width: min(100%, 263px);
+  }
+  .gia-committee--management .gia-committee__detail-image .gia-committee__image,
+  .gia-committee--management
+    .gia-committee__detail-image
+    .gia-committee__image-placeholder {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+  }
+  .gia-committee--management .gia-committee__detail-copy {
+    padding-top: 0;
+  }
+}
+
+.gia-insurance-hero {
+  width: 100%;
+  height: clamp(210px, 27vw, 420px);
+  background-color: #eee;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+.gia-insurance-single {
+  padding: 0 20px 48px;
+}
+.gia-insurance-single__intro {
+  position: relative;
+  margin: -100px auto 0;
+  padding: 18px 30px 30px;
+  background: #f8f8f8;
+}
+.gia-insurance-single__title {
+  margin: 0 0 16px;
+  color: #d86018;
+  font-family: "DINOT";
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+}
+.gia-insurance-single__body,
+.gia-insurance-single__body p {
+  color: #111;
+  font-size: 14px;
+  line-height: 1.7;
+}
+.gia-insurance-single__body > :last-child {
+  margin-bottom: 0;
+}
+.gia-insurance-faq {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid #eee;
+}
+.gia-insurance-faq__heading {
+  margin: 0 0 28px;
+  font-family: "DINOT-Regular";
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1.4;
+  text-align: center;
+}
+.gia-insurance-faq__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  column-gap: 32px;
+  row-gap: 26px;
+}
+.gia-insurance-faq__question {
+  margin: 0 0 8px;
+  color: #111;
+  font-family: "DINOT";
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.4;
+}
+.gia-insurance-faq__answer,
+.gia-insurance-faq__answer p {
+  margin: 0;
+  color: #333;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.gia-insurance-faq__link,
+.gia-insurance-faq__more a {
+  display: inline-block;
+  margin-top: 6px;
+  color: #d86018;
+  font-size: 12px;
+  line-height: 1.4;
+  text-decoration: underline;
+}
+.gia-insurance-faq__more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 44px;
+  margin-top: 30px;
+  background: #f0f2f6;
+  color: #111;
+  font-size: 13px;
+}
+.gia-insurance-faq__more a {
+  margin-top: 0;
+}
+.gia-insurance-single__breadcrumbs {
+  padding: 12px 0;
+  background: #f0f2f6;
+}
+
+@media (max-width: 767px) {
+  .gia-insurance-single {
+    padding-right: 16px;
+    padding-left: 16px;
+  }
+  .gia-insurance-single__intro {
+    width: 100%;
+    margin-top: -24px;
+    padding: 20px;
+  }
+  .gia-insurance-single__title {
+    font-size: 22px;
+  }
+  .gia-insurance-faq {
+    margin-top: 36px;
+    padding-top: 26px;
+  }
+  .gia-insurance-faq__grid {
+    grid-template-columns: 1fr;
+    row-gap: 22px;
+  }
+  .gia-insurance-faq__more {
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    padding: 8px 12px;
+  }
+}
+
+#member-directory .gia-committee__rows {
+  gap: 40px;
+}
+#member-directory .gia-committee__row {
+  max-width: 1000px;
+  margin: 0 auto;
+  column-gap: 10px;
+  row-gap: 24px;
+}
+#member-directory .gia-committee__image {
+  display: block;
+  width: 100%;
+  height: 150px;
+  min-height: 0;
+  aspect-ratio: auto;
+  margin: 0 auto 10px;
+  padding: 10px;
+  border: 1px solid #e5e5e5;
+  background: #fff;
+  box-sizing: border-box;
+  object-fit: contain;
+}
+#member-directory .gia-committee__name {
+  min-height: 80px;
+  padding: 0 8px;
+  color: #111;
+  font-size: 15px;
+  line-height: 24px;
+}
+#member-directory .gia-committee__detail-panel {
+  width: min(1190px, calc(100vw - 40px));
+  max-width: none;
+  min-height: 293px;
+  margin-left: 50%;
+  box-sizing: border-box;
+  padding: 44px 16px;
+  transform: translateX(-50%);
+}
+#member-directory .gia-committee__detail-panel::before {
+  position: absolute;
+  top: -16px;
+  left: var(--gia-committee-pointer-x, 33%);
+  width: 0;
+  height: 0;
+  border-right: 16px solid transparent;
+  border-bottom: 16px solid #e5e5e5;
+  border-left: 16px solid transparent;
+  content: "";
+  transform: translateX(-50%);
+}
+#member-directory .gia-committee__detail-image {
+  flex: 0 0 260px;
+}
+#member-directory .gia-committee__detail-image .gia-committee__image {
+  width: 260px;
+  height: auto;
+  min-height: 0;
+  max-height: 150px;
+  aspect-ratio: auto;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  object-fit: contain;
+  object-position: left center;
+}
+#member-directory .gia-committee__detail-title {
+  margin-top: 10px;
+}
+
+@media (max-width: 767px) {
+  #member-directory .gia-committee__name {
+    min-height: 0;
+    padding: 0 4px;
+    font-size: 14px;
+  }
+  #member-directory .gia-committee__detail-panel {
+    width: calc(100vw - 32px);
+    min-height: 0;
+    padding: 48px 16px 22px;
+  }
+  #member-directory .gia-committee__detail-image {
+    flex-basis: auto;
+    width: min(100%, 260px);
+  }
 }
