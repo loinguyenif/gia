@@ -190,13 +190,19 @@ ul.black-dot > li {
   pointer-events: none;
 }
 
+.apat-searchform {
+  position: relative;
+}
 #searchform #s {
+  box-sizing: border-box;
+  display: block;
   height: 70px;
   background: #fff;
-  width: 100%;
+  width: 625px;
   border: none;
   box-shadow: none;
   padding-left: 15px;
+  padding-right: 85px;
   border-left: 8px solid #d86018;
   font-size: 16px;
   color: #666666;
@@ -204,10 +210,13 @@ ul.black-dot > li {
 }
 #searchform #searchsubmit {
   position: absolute;
-  right: 0px;
-  top: -70px;
+  right: 0;
+  top: 0;
   height: 70px;
   width: 70px;
   background: #000;
-  border-radius: 0px;
+  border: 0;
+  border-radius: 0;
+  color: #fff;
+  cursor: pointer;
 }

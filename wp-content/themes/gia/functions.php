@@ -1017,6 +1017,10 @@ add_shortcode( 'apat_breadcrumbs', 'apat_breadcrumbs');
 
 
 function apat_searchform() {
+    return '<form role="search" method="get" id="searchform" class="search-form apat-searchform" action="' . esc_url( home_url( '/' ) ) . '">'
+        . '<input type="search" id="s" name="s" value="' . esc_attr( get_search_query() ) . '" placeholder="' . esc_attr__( 'Start typing to see instant results', 'gia' ) . '" aria-label="' . esc_attr__( 'Search for:', 'gia' ) . '" />'
+        . '<button type="submit" id="searchsubmit" aria-label="' . esc_attr__( 'Search', 'gia' ) . '"><i class="fas fa-search" aria-hidden="true"></i></button>'
+        . '</form>';
 }
 add_shortcode( 'apat_searchform', 'apat_searchform');
 
