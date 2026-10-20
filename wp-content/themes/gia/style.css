@@ -848,3 +848,41 @@ ul.black-dot > li {
     width: min(100%, 260px);
   }
 }
+
+.careers-items .e-default-div {
+  position: relative;
+}
+.careers-items .e-default-h5 {
+  display: inline-block;
+  padding: 5px 25px;
+  font-size: 18px;
+  line-height: 32px;
+  font-family: "DINOT-Regular";
+  color: #ffffff;
+  text-transform: capitalize;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+}
+.careers-items .elementor-widget-text-editor,
+.careers-items .e-default-h6 {
+  display: none;
+}
+.careers-items .e-lazyloaded:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+.careers-items .e-lazyloaded:hover .e-default-h5 {
+  position: relative;
+  background: none;
+  opacity: 1;
+}
+.careers-items .e-lazyloaded:hover .elementor-widget-text-editor,
+.careers-items .e-lazyloaded:hover .e-default-h6 {
+  display: block;
+  opacity: 1;
+  position: relative;
+}
+.careers-items .e-lazyloaded:hover .elementor-widget-text-editor p {
+  color: #ffffff;
+}
