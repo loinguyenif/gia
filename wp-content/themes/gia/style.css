@@ -734,7 +734,87 @@ ul.black-dot > li {
   background: #f0f2f6;
 }
 
+.gia-resources-banner {
+  display: flex;
+  min-height: 180px;
+  height: 16.1vw;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  box-sizing: border-box;
+}
+.gia-resources-banner h1 {
+  margin: 0;
+  color: #fff;
+  font-family: "DINOT";
+  font-size: 36px;
+  font-weight: 900;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+}
+.small-menu {
+  border-bottom: 1px solid #ddd;
+  background-color: #fff;
+}
+.small-menu .container {
+  display: flex;
+  min-height: 55px;
+  align-items: stretch;
+  justify-content: center;
+}
+.small-menu ul {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0 30px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.small-menu li {
+  display: flex;
+  align-items: stretch;
+}
+.small-menu a {
+  display: flex;
+  align-items: center;
+  color: #111;
+  font-size: 15px;
+  line-height: 1.4;
+  text-decoration: none;
+}
+.small-menu a:hover,
+.small-menu a:focus,
+.small-menu a.is-active {
+  color: #d86018;
+}
+.small-menu a.is-active {
+  font-weight: 700;
+}
+
 @media (max-width: 767px) {
+  .gia-resources-banner {
+    min-height: 170px;
+    height: 42vw;
+  }
+  .gia-resources-banner h1 {
+    font-size: 30px;
+  }
+  .small-menu .container {
+    min-height: 52px;
+  }
+  .small-menu ul {
+    gap: 0 20px;
+  }
+  .small-menu a {
+    min-height: 52px;
+    font-size: 13px;
+  }
   .gia-insurance-single {
     padding-right: 16px;
     padding-left: 16px;
