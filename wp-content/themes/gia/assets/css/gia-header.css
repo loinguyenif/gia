@@ -160,6 +160,14 @@ html {
   white-space: nowrap;
 }
 
+.gia-nav__list--desktop > .gia-nav__search-item > .gia-nav__search-link {
+  min-width: 56px;
+  justify-content: center;
+  padding-right: 14px;
+  padding-left: 14px;
+  font-size: 20px;
+}
+
 .gia-nav__list--desktop > li:focus-within,
 .gia-nav__list--desktop > li.is-open,
 .gia-nav__list--desktop > li.current-menu-item,

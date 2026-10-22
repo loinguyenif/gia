@@ -94,8 +94,63 @@ function gia_register_styles() {
     wp_enqueue_style( 'responsive-css', THEME_URL . '/assets/css/responsive.css', array());
     wp_enqueue_style( 'gia-header-css', THEME_URL . '/assets/css/gia-header.css', array(), $theme_version );
     wp_enqueue_style( 'gia-footer-css', THEME_URL . '/assets/css/gia-footer.css', array( 'gia-header-css' ), $theme_version );
+    wp_enqueue_style( 'gia-search-css', THEME_URL . '/assets/css/gia-search.css', array( 'gia-header-css' ), $theme_version );
 }
 add_action( 'wp_enqueue_scripts', 'gia_register_styles' );
+
+/**
+ * Add a search entry to the desktop header menu.
+ *
+ * @param string   $items Menu item markup.
+ * @param stdClass $args  Menu arguments.
+ * @return string
+ */
+function gia_header_add_search_menu_item( $items, $args ) {
+    if ( empty( $args->menu_id ) || 'gia-nav-desktop-menu' !== $args->menu_id ) {
+        return $items;
+    }
+
+    $search_url = add_query_arg( 'gia_search_page', '1', home_url( '/' ) );
+
+    $items .= sprintf(
+        '<li class="menu-item gia-nav__search-item"><a class="gia-nav__search-link" href="%1$s" aria-label="%2$s"><i class="fal fa-search" aria-hidden="true"></i><span class="screen-reader-text">%2$s</span></a></li>',
+        esc_url( $search_url ),
+        esc_attr__( 'Search', 'gia' )
+    );
+
+    return $items;
+}
+add_filter( 'wp_nav_menu_items', 'gia_header_add_search_menu_item', 10, 2 );
+
+/**
+ * Register the query var used by the search landing page.
+ *
+ * @param array $query_vars Public query variables.
+ * @return array
+ */
+function gia_register_search_page_query_var( $query_vars ) {
+    $query_vars[] = 'gia_search_page';
+
+    return $query_vars;
+}
+add_filter( 'query_vars', 'gia_register_search_page_query_var' );
+
+/**
+ * Use the theme search template for the search landing URL.
+ *
+ * @param string $template Template selected by WordPress.
+ * @return string
+ */
+function gia_search_page_template( $template ) {
+    if ( '1' !== get_query_var( 'gia_search_page' ) ) {
+        return $template;
+    }
+
+    $search_template = get_theme_file_path( '/search.php' );
+
+    return is_readable( $search_template ) ? $search_template : $template;
+}
+add_filter( 'template_include', 'gia_search_page_template' );
 
 /**
  * Add the theme font to Elementor's font selector.
