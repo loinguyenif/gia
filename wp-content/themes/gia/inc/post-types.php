@@ -372,3 +372,82 @@ add_action('admin_enqueue_scripts', function ($hook) {
         });
     ");
 });
+
+
+add_action( 'init', 'faq_post_type', 0 );
+function faq_post_type() {
+
+	$labels = array(
+		'name'                => _x( 'FAQs', 'Post Type General Name', 'gia' ),
+		'singular_name'       => _x( 'FAQ', 'Post Type Singular Name', 'gia' ),
+		'menu_name'           => __( 'FAQs', 'gia' ),
+		'all_items'           => __( 'All FAQs', 'gia' ),
+		'view_item'           => __( 'View FAQ', 'gia' ),
+		'add_new_item'        => __( 'Add FAQ', 'gia' ),
+		'add_new'             => __( 'Add FAQ', 'gia' ),
+		'edit_item'           => __( 'Edit FAQ', 'gia' ),
+		'update_item'         => __( 'Update FAQ', 'gia' ),
+		'search_items'        => __( 'Search FAQ', 'gia' ),
+		'not_found'           => __( 'Not Found', 'gia' ),
+		'not_found_in_trash'  => __( 'Not found in Trash', 'gia' ),
+	);
+
+    // Set other options for Custom Post Type
+	$args = array(
+		'label'               => __( 'FAQs', 'gia' ),
+		'description'         => __( 'FAQs', 'gia' ),
+		'labels'              => $labels,
+		'menu_icon'			  => 'dashicons-editor-help',
+		// Features this CPT supports in Post Editor
+        'supports'     => array(
+            'title',
+            'editor',
+            'revisions',
+            'elementor',
+        ),
+		'hierarchical'        => false,
+		'public'              => true,
+		'show_ui'             => true,
+		'show_in_menu'        => true,
+		'show_in_nav_menus'   => true,
+		'show_in_admin_bar'   => true,
+		'menu_position'       => 6,
+		'can_export'          => true,
+		'has_archive'         => true,
+		'exclude_from_search' => false,
+		'publicly_queryable'  => true,
+		'show_in_rest'        => true,
+		'capability_type'     => 'post',
+	);
+	register_post_type( 'faq', $args );
+}
+
+function create_faq_category_taxonomies() {
+	// Add new taxonomy name affiliate-tags
+	$labels = array(
+		'name'              => _x( 'FAQ categories', 'taxonomy general name', 'gia' ),
+		'singular_name'     => _x( 'Categories', 'taxonomy singular name', 'gia' ),
+		'search_items'      => __( 'Search Category', 'gia' ),
+		'all_items'         => __( 'All Category', 'gia' ),
+		'parent_item'       => __( 'Parent Category ', 'gia' ),
+		'parent_item_colon' => __( 'Parent Category', 'gia' ),
+		'edit_item'         => __( 'Edit Category', 'gia' ),
+		'update_item'       => __( 'Update Category ', 'gia' ),
+		'add_new_item'      => __( 'Add New Category ', 'gia' ),
+		'new_item_name'     => __( 'New Category Name', 'gia' ),
+		'menu_name'         => __( 'Categories', 'gia' ),
+	);
+
+	$args = array(
+		'hierarchical'      => true,
+		'labels'            => $labels,
+		'show_ui'           => true,
+		'show_admin_column' => true,
+		'show_in_rest'      => true,
+		'query_var'         => true,
+		'rewrite'           => array( 'slug' => 'faqcat' ),
+	);
+
+	register_taxonomy( 'faqcat', array( 'faq' ), $args );
+}
+add_action( 'init', 'create_faq_category_taxonomies', 0 );

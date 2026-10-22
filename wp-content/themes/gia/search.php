@@ -108,5 +108,14 @@ $search_query      = get_search_query( false );
 		</section>
 	<?php endif; ?>
 </main>
-
+<div class="gia-insurance-single__breadcrumbs">
+    <div class="container">
+        <?php
+        if ( shortcode_exists( 'apat_breadcrumbs' ) ) {
+            echo do_shortcode( '[apat_breadcrumbs]' ); 
+        }
+        ?>
+    </div>
+    
+</div>
 <?php get_footer(); ?>

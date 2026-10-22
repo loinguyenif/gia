@@ -12,6 +12,7 @@ add_filter('use_block_editor_for_post', '__return_false', 10);
 //require THEME_URL . '/inc/template-tags.php';
 require get_template_directory() . '/inc/post-types.php';
 require_once get_template_directory() . '/inc/class-gia-header-nav-walker.php';
+require_once get_template_directory() . '/inc/faq-layout.php';
 
 /**
  * Sets up theme defaults and registers support for various WordPress features.
@@ -95,6 +96,7 @@ function gia_register_styles() {
     wp_enqueue_style( 'gia-header-css', THEME_URL . '/assets/css/gia-header.css', array(), $theme_version );
     wp_enqueue_style( 'gia-footer-css', THEME_URL . '/assets/css/gia-footer.css', array( 'gia-header-css' ), $theme_version );
     wp_enqueue_style( 'gia-search-css', THEME_URL . '/assets/css/gia-search.css', array( 'gia-header-css' ), $theme_version );
+    wp_enqueue_style( 'gia-faq-css', THEME_URL . '/assets/css/gia-faq.css', array( 'gia-header-css' ), $theme_version );
 }
 add_action( 'wp_enqueue_scripts', 'gia_register_styles' );
 
