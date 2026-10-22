@@ -1300,7 +1300,7 @@ function gia_render_annual_report_items( $query ) {
         $pdf_url             = $pdf_id ? wp_get_attachment_url( $pdf_id ) : '';
 
         $items .= '<article class="gia-annual-reports__item">'
-            . '<a class="gia-annual-reports__link" href="' . esc_url( $pdf_url ) . '" aria-label="' . esc_attr( sprintf( __( 'View %s', 'gia' ), $title ) ) . '">'
+            . '<a class="gia-annual-reports__link" href="' . esc_url( $pdf_url ) . '" target="_blank" aria-label="' . esc_attr( sprintf( __( 'View %s', 'gia' ), $title ) ) . '">'
             . '<span class="gia-annual-reports__media">'
             . $image
             . '<span class="gia-annual-reports__overlay"><span class="gia-annual-reports__view"><i class="fas fa-search" aria-hidden="true"></i><span>' . esc_html__( 'View More', 'gia' ) . '</span></span></span>'

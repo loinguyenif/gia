@@ -71,19 +71,25 @@
 
       if (!link || !submenu) return;
 
-      var button = document.createElement("button");
+      var button = item.querySelector(":scope > .gia-nav__submenu-toggle");
+      if (!button) {
+        button = document.createElement("button");
+        button.innerHTML = mobile
+          ? '<span aria-hidden="true">&#8964;</span>'
+          : '<i class="fal fa-angle-down" aria-hidden="true"></i>';
+        link.after(button);
+      }
+
       button.className = mobile
         ? "gia-nav__submenu-toggle gia-nav__submenu-toggle--mobile"
         : "gia-nav__submenu-toggle";
       button.type = "button";
       button.setAttribute("aria-expanded", "false");
       button.setAttribute("aria-label", "Toggle submenu for " + link.textContent.trim());
-      button.innerHTML = mobile
-        ? '<span aria-hidden="true">&#8964;</span>'
-        : '<i class="fal fa-angle-down" aria-hidden="true"></i>';
-      submenu.id = (mobile ? "gia-nav-mobile-submenu-" : "gia-nav-desktop-submenu-") + index;
+      if (!submenu.id) {
+        submenu.id = (mobile ? "gia-nav-mobile-submenu-" : "gia-nav-desktop-submenu-") + index;
+      }
       button.setAttribute("aria-controls", submenu.id);
-      link.after(button);
 
       button.addEventListener("click", function () {
         if (
