@@ -57,6 +57,7 @@ a {
 
 a:hover {
   color: #23527c;
+  text-decoration: none;
 }
 .mod-text a {
   color: #d86018;
@@ -340,6 +341,269 @@ ul.black-dot > li {
   .gia-other-insurance__load-more {
     width: 100%;
     margin-top: 48px;
+  }
+}
+
+.gia-company-news {
+  margin: 50px auto;
+}
+.gia-company-news__items {
+  display: grid;
+  gap: 32px;
+  margin-bottom: 50px;
+}
+.gia-company-news__item {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7.2fr);
+  gap: 28px;
+  min-height: 200px;
+}
+.gia-company-news__media {
+  display: flex;
+  min-width: 0;
+  min-height: 200px;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid #d5d5d5;
+  background: #fff;
+}
+.gia-company-news__image,
+.gia-company-news__image-placeholder {
+  display: block;
+  width: 40%;
+  height: 100%;
+  min-height: 200px;
+  object-fit: contain;
+}
+.gia-company-news__content {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding-top: 2px;
+}
+.gia-company-news__title {
+  margin: 0;
+  color: #111;
+  font-family: "DINOT";
+  font-size: 21px;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.gia-company-news__title a {
+  color: inherit;
+  text-decoration: none;
+}
+.gia-company-news__title a:hover,
+.gia-company-news__title a:focus {
+  color: #d86018;
+}
+.gia-company-news__date {
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+  border-top: 1px solid #d8d8d8;
+  border-bottom: 1px solid #d8d8d8;
+  color: #777;
+  font-size: 14px;
+  line-height: 1.4;
+}
+.gia-company-news__date i {
+  color: #52616e;
+  font-size: 15px;
+}
+.gia-company-news__load-more {
+  display: block;
+  width: min(60%, 524px);
+  min-height: 46px;
+  margin: 32px auto 48px;
+  border: 1px solid #d5dce5;
+  border-radius: 24px;
+  background: #fff;
+  color: #777;
+  cursor: pointer;
+  font-family: "DINOT-Regular";
+  font-size: 14px;
+}
+.gia-company-news__load-more:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.gia-company-news__error,
+.gia-company-news__empty {
+  margin: 20px auto;
+  color: #b00020;
+  text-align: center;
+}
+.gia-company-news__empty {
+  width: min(100% - 32px, 1044px);
+  color: #555;
+}
+
+.gia-annual-reports {
+  width: min(100% - 32px, 1160px);
+  margin: 48px auto 0;
+}
+.gia-annual-reports__items {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 30px;
+}
+.gia-annual-reports__item {
+  min-width: 0;
+  margin: 0;
+  background: #eee;
+}
+.gia-annual-reports__link {
+  display: block;
+  color: #111;
+  text-decoration: none;
+}
+.gia-annual-reports__media {
+  position: relative;
+  display: flex;
+  aspect-ratio: 7 / 10;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #f2f2f2;
+}
+.gia-annual-reports__image,
+.gia-annual-reports__image-placeholder {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 220ms ease;
+}
+.gia-annual-reports__image-placeholder {
+  background: #f2f2f2;
+}
+.gia-annual-reports__overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(0 0 0 / 70%);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 180ms ease;
+}
+.gia-annual-reports__view {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  font-family: "DINOT";
+  font-size: 16px;
+  font-weight: 700;
+}
+.gia-annual-reports__view i {
+  font-size: 18px;
+}
+.gia-annual-reports__link:hover .gia-annual-reports__overlay,
+.gia-annual-reports__link:focus-visible .gia-annual-reports__overlay {
+  opacity: 1;
+}
+.gia-annual-reports__link:hover .gia-annual-reports__image,
+.gia-annual-reports__link:focus-visible .gia-annual-reports__image {
+  transform: scale(1.025);
+}
+.gia-annual-reports__title {
+  display: flex;
+  min-height: 55px;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 12px;
+  background: #eee;
+  color: #111;
+  font-family: "DINOT";
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+}
+.gia-annual-reports__load-more {
+  display: block;
+  width: min(100%, 812px);
+  min-height: 48px;
+  margin: 78px auto 48px;
+  border: 1px solid #d5dce5;
+  border-radius: 25px;
+  background: #fff;
+  color: #777;
+  cursor: pointer;
+  font-family: "DINOT-Regular";
+  font-size: 14px;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    color 180ms ease;
+}
+.gia-annual-reports__load-more:hover,
+.gia-annual-reports__load-more:focus-visible {
+  border-color: #d86018;
+  background: #d86018;
+  color: #fff;
+}
+.gia-annual-reports__load-more:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+.gia-annual-reports__error,
+.gia-annual-reports__empty {
+  margin: 20px auto;
+  color: #b00020;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .gia-annual-reports__items {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px 16px;
+  }
+  .gia-annual-reports__load-more {
+    margin-top: 42px;
+  }
+  .gia-company-news {
+    margin-top: 32px;
+  }
+  .gia-company-news__item {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+    min-height: 0;
+  }
+  .gia-company-news__media,
+  .gia-company-news__image,
+  .gia-company-news__image-placeholder {
+    min-height: 240px;
+    height: 240px;
+  }
+  .gia-company-news__content {
+    min-height: 150px;
+    padding: 0;
+  }
+  .gia-company-news__title {
+    font-size: 19px;
+  }
+  .gia-company-news__date {
+    margin-top: 28px;
+  }
+  .gia-company-news__load-more {
+    width: 100%;
+    margin-top: 28px;
+  }
+}
+
+@media (max-width: 520px) {
+  .gia-annual-reports__items {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .gia-annual-reports__media {
+    aspect-ratio: 4 / 5;
   }
 }
 
@@ -797,6 +1061,37 @@ ul.black-dot > li {
   font-weight: 700;
 }
 
+.gia-company-news-single {
+  margin: 60px auto 50px;
+}
+.gia-company-news-single__title {
+  margin: 0 0 22px;
+  color: #111;
+  font-family: "DINOT-Regular";
+  font-size: 32px;
+  font-weight: 400;
+  line-height: 1.2;
+}
+.gia-company-news-single__pdf {
+  min-height: 40px;
+  padding: 0 16px 10px;
+  border-bottom: 1px solid #d8d8d8;
+}
+.gia-company-news-single__pdf a {
+  color: #d86018;
+  font-size: 14px;
+  line-height: 1.4;
+  text-decoration: none;
+}
+.gia-company-news-single__pdf a:hover,
+.gia-company-news-single__pdf a:focus {
+  color: #b94f13;
+  text-decoration: underline;
+}
+.gia-company-news-single__content {
+  padding-top: 20px;
+}
+
 @media (max-width: 767px) {
   .gia-resources-banner {
     min-height: 170px;
@@ -814,6 +1109,15 @@ ul.black-dot > li {
   .small-menu a {
     min-height: 52px;
     font-size: 13px;
+  }
+  .gia-company-news-single {
+    margin-top: 40px;
+  }
+  .gia-company-news-single__title {
+    font-size: 25px;
+  }
+  .gia-company-news-single__pdf {
+    padding-left: 10px;
   }
   .gia-insurance-single {
     padding-right: 16px;

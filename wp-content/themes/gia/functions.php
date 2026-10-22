@@ -690,6 +690,8 @@ function gia_register_scripts() {
             'ajaxUrl'                   => admin_url( 'admin-ajax.php' ),
             'nonce'                     => wp_create_nonce( 'gia_load_more_insurance' ),
             'managementCommitteeNonce' => wp_create_nonce( 'gia_load_more_management_committee' ),
+            'companyNewsNonce'          => wp_create_nonce( 'gia_load_more_company_news' ),
+            'annualReportsNonce'        => wp_create_nonce( 'gia_load_more_annual_reports' ),
         )
     );
     wp_enqueue_script( 'gia-header-js', THEME_URL . '/assets/js/gia-header.js', array(), $theme_version, true );
@@ -1173,6 +1175,186 @@ function load_more_types_of_insurance_ajax() {
 add_action('wp_ajax_nopriv_load_more_types_of_insurance_ajax', 'load_more_types_of_insurance_ajax');
 add_action('wp_ajax_load_more_types_of_insurance_ajax', 'load_more_types_of_insurance_ajax');
 
+function gia_render_company_news_items( $query ) {
+    $items   = '';
+    $logo_id = absint( get_theme_mod( 'custom_logo' ) );
+
+    while ( $query->have_posts() ) {
+        $query->the_post();
+        $post_id  = get_the_ID();
+        $title    = get_the_title( $post_id );
+        $permalink = get_permalink( $post_id );
+        $image    = get_the_post_thumbnail(
+            $post_id,
+            'large',
+            array(
+                'class' => 'gia-company-news__image',
+                'alt'   => $title,
+            )
+        );
+
+        if ( ! $image ) {
+            $image = $logo_id
+                ? wp_get_attachment_image(
+                    $logo_id,
+                    'large',
+                    false,
+                    array(
+                        'class' => 'gia-company-news__image',
+                        'alt'   => '',
+                    )
+                )
+                : '';
+        }
+
+        if ( ! $image ) {
+            $image = '<span class="gia-company-news__image-placeholder" aria-hidden="true"></span>';
+        }
+
+        $items .= '<article class="gia-company-news__item">'
+            . '<a class="gia-company-news__media" href="' . esc_url( $permalink ) . '" aria-label="' . esc_attr( $title ) . '">'
+            . $image
+            . '</a>'
+            . '<div class="gia-company-news__content">'
+            . '<h2 class="gia-company-news__title"><a href="' . esc_url( $permalink ) . '">' . esc_html( $title ) . '</a></h2>'
+            . '<time class="gia-company-news__date" datetime="' . esc_attr( get_the_date( DATE_W3C, $post_id ) ) . '">'
+            . '<i class="far fa-calendar-alt" aria-hidden="true"></i>'
+            . esc_html( get_the_date( 'M j, Y', $post_id ) )
+            . '</time>'
+            . '</div></article>';
+    }
+
+    return $items;
+}
+
+function gia_load_more_company_news_ajax() {
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+    if ( ! wp_verify_nonce( $nonce, 'gia_load_more_company_news' ) ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Your session has expired. Please reload the page.', 'gia' ) ),
+            403
+        );
+    }
+
+    $category_id = isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0;
+    $page        = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 0;
+    $category    = get_term( $category_id, 'category' );
+
+    if (
+        ! $category instanceof WP_Term ||
+        ! in_array( $category->slug, array( 'media-center', 'company-news' ), true ) ||
+        $page < 2 ||
+        $page > 100
+    ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Unable to load more company news.', 'gia' ) ),
+            400
+        );
+    }
+
+    $query = new WP_Query(
+        array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => 20,
+            'paged'               => $page,
+            'cat'                 => $category_id,
+            'orderby'             => 'date',
+            'order'               => 'DESC',
+            'ignore_sticky_posts' => true,
+        )
+    );
+
+    wp_send_json_success(
+        array(
+            'html'     => gia_render_company_news_items( $query ),
+            'has_more' => $query->max_num_pages > $page,
+        )
+    );
+}
+add_action( 'wp_ajax_nopriv_load_more_company_news_ajax', 'gia_load_more_company_news_ajax' );
+add_action( 'wp_ajax_load_more_company_news_ajax', 'gia_load_more_company_news_ajax' );
+
+function gia_render_annual_report_items( $query ) {
+    $items = '';
+
+    while ( $query->have_posts() ) {
+        $query->the_post();
+        $post_id = get_the_ID();
+        $title   = get_the_title( $post_id );
+        $image   = get_the_post_thumbnail(
+            $post_id,
+            'large',
+            array(
+                'class' => 'gia-annual-reports__image',
+                'alt'   => $title,
+            )
+        );
+
+        if ( ! $image ) {
+            $image = '<span class="gia-annual-reports__image-placeholder" aria-hidden="true"></span>';
+        }
+
+        $pdf_id              = absint( get_post_meta( $post_id, '_post_pdf_file_id', true ) );
+        $pdf_url             = $pdf_id ? wp_get_attachment_url( $pdf_id ) : '';
+
+        $items .= '<article class="gia-annual-reports__item">'
+            . '<a class="gia-annual-reports__link" href="' . esc_url( $pdf_url ) . '" aria-label="' . esc_attr( sprintf( __( 'View %s', 'gia' ), $title ) ) . '">'
+            . '<span class="gia-annual-reports__media">'
+            . $image
+            . '<span class="gia-annual-reports__overlay"><span class="gia-annual-reports__view"><i class="fas fa-search" aria-hidden="true"></i><span>' . esc_html__( 'View More', 'gia' ) . '</span></span></span>'
+            . '</span>'
+            . '<span class="gia-annual-reports__title">' . esc_html( $title ) . '</span>'
+            . '</a></article>';
+    }
+
+    return $items;
+}
+
+function gia_load_more_annual_reports_ajax() {
+    $nonce = isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash( $_POST['nonce'] ) ) : '';
+
+    if ( ! wp_verify_nonce( $nonce, 'gia_load_more_annual_reports' ) ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Your session has expired. Please reload the page.', 'gia' ) ),
+            403
+        );
+    }
+
+    $category_id = isset( $_POST['category'] ) ? absint( $_POST['category'] ) : 0;
+    $page        = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 0;
+    $category    = get_term( $category_id, 'category' );
+
+    if ( ! $category instanceof WP_Term || 'annual-reports' !== $category->slug || $page < 2 || $page > 100 ) {
+        wp_send_json_error(
+            array( 'message' => __( 'Unable to load more annual reports.', 'gia' ) ),
+            400
+        );
+    }
+
+    $query = new WP_Query(
+        array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => 9,
+            'paged'               => $page,
+            'cat'                 => $category_id,
+            'orderby'             => 'date',
+            'order'               => 'DESC',
+            'ignore_sticky_posts' => true,
+        )
+    );
+
+    wp_send_json_success(
+        array(
+            'html'     => gia_render_annual_report_items( $query ),
+            'has_more' => $query->max_num_pages > $page,
+        )
+    );
+}
+add_action( 'wp_ajax_nopriv_load_more_annual_reports_ajax', 'gia_load_more_annual_reports_ajax' );
+add_action( 'wp_ajax_load_more_annual_reports_ajax', 'gia_load_more_annual_reports_ajax' );
 
 function gia_render_management_committee_items( $query ) {
     $output = '';

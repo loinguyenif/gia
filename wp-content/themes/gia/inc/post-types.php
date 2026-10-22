@@ -1,4 +1,3 @@
-
 <?php
 /**
  * Add PDF upload field to WordPress Posts.

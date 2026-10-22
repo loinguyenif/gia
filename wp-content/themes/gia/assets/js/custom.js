@@ -176,6 +176,154 @@ jQuery(document).ready(function () {
 });
 
 document.addEventListener("click", function (event) {
+  var button = event.target.closest(".gia-annual-reports__load-more");
+  if (!button || !window.giaOtherInsurance) {
+    return;
+  }
+
+  var wrapper = button.closest(".gia-annual-reports");
+  var items = wrapper.querySelector(".gia-annual-reports__items");
+  var nextPage = Number(wrapper.dataset.page) + 1;
+  var buttonText = button.textContent.trim();
+
+  button.disabled = true;
+  button.textContent = "Loading...";
+  button.setAttribute("aria-busy", "true");
+
+  var body = new URLSearchParams({
+    action: "load_more_annual_reports_ajax",
+    category: wrapper.dataset.category,
+    page: String(nextPage),
+    nonce: window.giaOtherInsurance.annualReportsNonce,
+  });
+
+  fetch(window.giaOtherInsurance.ajaxUrl, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    },
+    body: body.toString(),
+  })
+    .then(function (response) {
+      return response.json().then(function (data) {
+        if (!response.ok || !data.success) {
+          throw new Error(
+            data.data && data.data.message
+              ? data.data.message
+              : "Unable to load more annual reports. Please try again.",
+          );
+        }
+        return data.data;
+      });
+    })
+    .then(function (data) {
+      items.insertAdjacentHTML("beforeend", data.html);
+      wrapper.dataset.page = String(nextPage);
+
+      var errorMessage = wrapper.querySelector(".gia-annual-reports__error");
+      if (errorMessage) {
+        errorMessage.remove();
+      }
+
+      if (!data.has_more) {
+        button.remove();
+      }
+    })
+    .catch(function (error) {
+      var message = wrapper.querySelector(".gia-annual-reports__error");
+      if (!message) {
+        message = document.createElement("p");
+        message.className = "gia-annual-reports__error";
+        message.setAttribute("role", "alert");
+        button.before(message);
+      }
+      message.textContent = error.message;
+    })
+    .finally(function () {
+      if (button.isConnected) {
+        button.disabled = false;
+        button.textContent = buttonText;
+        button.removeAttribute("aria-busy");
+      }
+    });
+});
+
+document.addEventListener("click", function (event) {
+  var button = event.target.closest(".gia-company-news__load-more");
+  if (!button || !window.giaOtherInsurance) {
+    return;
+  }
+
+  var wrapper = button.closest(".gia-company-news");
+  var items = wrapper.querySelector(".gia-company-news__items");
+  var nextPage = Number(wrapper.dataset.page) + 1;
+  var buttonText = button.textContent.trim();
+
+  button.disabled = true;
+  button.textContent = "Loading...";
+  button.setAttribute("aria-busy", "true");
+
+  var body = new URLSearchParams({
+    action: "load_more_company_news_ajax",
+    category: wrapper.dataset.category,
+    page: String(nextPage),
+    nonce: window.giaOtherInsurance.companyNewsNonce,
+  });
+
+  fetch(window.giaOtherInsurance.ajaxUrl, {
+    method: "POST",
+    credentials: "same-origin",
+    headers: {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+    },
+    body: body.toString(),
+  })
+    .then(function (response) {
+      return response.json().then(function (data) {
+        if (!response.ok || !data.success) {
+          throw new Error(
+            data.data && data.data.message
+              ? data.data.message
+              : "Unable to load more company news. Please try again.",
+          );
+        }
+        return data.data;
+      });
+    })
+    .then(function (data) {
+      items.insertAdjacentHTML("beforeend", data.html);
+      wrapper.dataset.page = String(nextPage);
+
+      var errorMessage = wrapper.querySelector(".gia-company-news__error");
+      if (errorMessage) {
+        errorMessage.remove();
+      }
+
+      if (!data.has_more) {
+        button.remove();
+      }
+    })
+    .catch(function (error) {
+      var message = wrapper.querySelector(".gia-company-news__error");
+      if (!message) {
+        message = document.createElement("p");
+        message.className = "gia-company-news__error";
+        message.setAttribute("role", "alert");
+        button.before(message);
+      }
+      message.textContent = error.message;
+    })
+    .finally(function () {
+      if (button.isConnected) {
+        button.disabled = false;
+        button.textContent = buttonText;
+        button.removeAttribute("aria-busy");
+      }
+    });
+});
+
+document.addEventListener("click", function (event) {
   var button = event.target.closest(".gia-other-insurance__load-more");
   if (!button || !window.giaOtherInsurance) {
     return;
