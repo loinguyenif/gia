@@ -365,7 +365,7 @@ ul.black-dot > li {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  border: 1px solid #d5d5d5;
+  border: 1px solid #d8d8d8;
   background: #fff;
 }
 .gia-company-news__image,
@@ -443,12 +443,11 @@ ul.black-dot > li {
 }
 
 .gia-annual-reports {
-  width: min(100% - 32px, 1160px);
-  margin: 48px auto 0;
+  margin: 50px auto;
 }
 .gia-annual-reports__items {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 32px 30px;
 }
 .gia-annual-reports__item {
@@ -469,6 +468,7 @@ ul.black-dot > li {
   justify-content: center;
   overflow: hidden;
   background: #f2f2f2;
+  border: 1px solid #f2f2f2;
 }
 .gia-annual-reports__image,
 .gia-annual-reports__image-placeholder {

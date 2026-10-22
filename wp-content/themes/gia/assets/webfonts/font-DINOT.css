@@ -1,7 +1,8 @@
 @font-face {
   font-family: 'DINOT-Black';
-  src: url('DINOT-Black.eot?#iefix') format('embedded-opentype'),  url('DINOT-Black.otf')  format('opentype'),
-	     url('DINOT-Black.woff') format('woff'), url('DINOT-Black.ttf')  format('truetype'), url('DINOT-Black.svg#DINOT-Black') format('svg');
+  src: url('DINOT-Black.woff') format('woff'), url('DINOT-Black.eot?#iefix') format('embedded-opentype'),  url('DINOT-Black.otf')  format('opentype'),
+	     url('DINOT-Black.ttf')  format('truetype'), url('DINOT-Black.svg#DINOT-Black') format('svg');
+  font-display: swap;
   font-weight: normal;
   font-style: normal;
 }
@@ -64,8 +65,9 @@
 
 @font-face {
   font-family: 'DINOT-Regular';
-  src: url('DINOT-Regular.eot?#iefix') format('embedded-opentype'),  url('DINOT-Regular.otf')  format('opentype'),
-	     url('DINOT-Regular.woff') format('woff'), url('DINOT-Regular.ttf')  format('truetype'), url('DINOT-Regular.svg#DINOT-Regular') format('svg');
+  src: url('DINOT-Regular.woff') format('woff'), url('DINOT-Regular.eot?#iefix') format('embedded-opentype'),  url('DINOT-Regular.otf')  format('opentype'),
+	     url('DINOT-Regular.ttf')  format('truetype'), url('DINOT-Regular.svg#DINOT-Regular') format('svg');
+  font-display: swap;
   font-weight: normal;
   font-style: normal;
 }

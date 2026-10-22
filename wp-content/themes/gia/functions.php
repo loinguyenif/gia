@@ -1337,7 +1337,7 @@ function gia_load_more_annual_reports_ajax() {
         array(
             'post_type'           => 'post',
             'post_status'         => 'publish',
-            'posts_per_page'      => 9,
+            'posts_per_page'      => 12,
             'paged'               => $page,
             'cat'                 => $category_id,
             'orderby'             => 'date',

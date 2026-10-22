@@ -4,6 +4,7 @@
 		<meta charset="<?php bloginfo( 'charset' ); ?>">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<link rel="profile" href="https://gmpg.org/xfn/11">
+		<link rel="preload" href="<?php echo esc_url( THEME_URL . '/assets/webfonts/DINOT-Regular.woff' ); ?>" as="font" type="font/woff" crossorigin>
 		<?php wp_head(); ?>
 	</head>
 
