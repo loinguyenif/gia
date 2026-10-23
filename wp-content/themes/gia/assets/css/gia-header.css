@@ -6,8 +6,7 @@ html {
   --gia-header-main-height: 126px;
   position: relative;
   z-index: 1000;
-  color: #111;
-  font-family: "DINOT-Regular", Arial, sans-serif;
+  color: #000;
 }
 
 .gia-header *,
@@ -52,7 +51,6 @@ html {
   padding: 0 16px;
   color: #fff;
   font-size: 15px;
-  font-weight: 500;
   text-decoration: none;
 }
 

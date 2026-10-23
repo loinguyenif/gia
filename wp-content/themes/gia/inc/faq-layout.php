@@ -62,7 +62,7 @@ function gia_faq_get_posts_for_term( $term_id ) {
 			'posts_per_page'         => -1,
 			'orderby'                => array(
 				'menu_order' => 'ASC',
-				'title'      => 'ASC',
+				'ID'      => 'DESC',
 			),
 			'no_found_rows'          => true,
 			'update_post_meta_cache' => false,
@@ -91,8 +91,8 @@ function gia_faq_get_child_terms( $root_id ) {
 			'taxonomy'   => 'faqcat',
 			'parent'     => (int) $root_id,
 			'hide_empty' => false,
-			'orderby'    => 'name',
-			'order'      => 'ASC',
+			'orderby'    => 'id',
+			'order'      => 'DESC',
 		)
 	);
 
