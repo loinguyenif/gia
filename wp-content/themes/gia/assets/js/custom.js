@@ -250,6 +250,85 @@ document.addEventListener("click", function (event) {
 });
 
 document.addEventListener("click", function (event) {
+  var target = event.target;
+  if (!target || typeof target.closest !== "function") {
+    return;
+  }
+
+  var toggle = target.closest(".gia-dropdown-link__toggle");
+  var dropdown = toggle && toggle.closest("[data-gia-dropdown-link]");
+
+  if (toggle && dropdown) {
+    var shouldOpen = toggle.getAttribute("aria-expanded") !== "true";
+
+    document
+      .querySelectorAll("[data-gia-dropdown-link].is-open")
+      .forEach(function (openDropdown) {
+        var openToggle = openDropdown.querySelector(
+          ".gia-dropdown-link__toggle",
+        );
+        var openMenu = openDropdown.querySelector(".gia-dropdown-link__menu");
+
+        openDropdown.classList.remove("is-open");
+        if (openToggle) {
+          openToggle.setAttribute("aria-expanded", "false");
+        }
+        if (openMenu) {
+          openMenu.hidden = true;
+        }
+      });
+
+    if (shouldOpen) {
+      var menu = dropdown.querySelector(".gia-dropdown-link__menu");
+      dropdown.classList.add("is-open");
+      toggle.setAttribute("aria-expanded", "true");
+      if (menu) {
+        menu.hidden = false;
+      }
+    }
+
+    return;
+  }
+
+  document
+    .querySelectorAll("[data-gia-dropdown-link].is-open")
+    .forEach(function (openDropdown) {
+      var menu = openDropdown.querySelector(".gia-dropdown-link__menu");
+      var openToggle = openDropdown.querySelector(".gia-dropdown-link__toggle");
+
+      openDropdown.classList.remove("is-open");
+      if (openToggle) {
+        openToggle.setAttribute("aria-expanded", "false");
+      }
+      if (menu) {
+        menu.hidden = true;
+      }
+    });
+});
+
+document.addEventListener("keydown", function (event) {
+  if (event.key !== "Escape") {
+    return;
+  }
+
+  document
+    .querySelectorAll("[data-gia-dropdown-link].is-open")
+    .forEach(function (dropdown) {
+      var menu = dropdown.querySelector(".gia-dropdown-link__menu");
+      var toggle = dropdown.querySelector(".gia-dropdown-link__toggle");
+
+      dropdown.classList.remove("is-open");
+      if (menu) {
+        menu.hidden = true;
+      }
+      if (toggle) {
+        toggle.setAttribute("aria-expanded", "false");
+        toggle.focus();
+      }
+    });
+});
+
+document.addEventListener("click", function (event) {
   var button = event.target.closest(".gia-company-news__load-more");
   if (!button || !window.giaOtherInsurance) {
     return;

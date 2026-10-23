@@ -15,6 +15,17 @@ require_once get_template_directory() . '/inc/class-gia-header-nav-walker.php';
 require_once get_template_directory() . '/inc/faq-layout.php';
 
 /**
+ * Register the theme's Elementor widgets.
+ *
+ * @param object $widgets_manager Elementor widgets manager.
+ */
+function gia_register_elementor_widgets( $widgets_manager ) {
+    require_once get_template_directory() . '/inc/class-gia-dropdown-link-widget.php';
+    $widgets_manager->register( new Gia_Dropdown_Link_Widget() );
+}
+add_action( 'elementor/widgets/register', 'gia_register_elementor_widgets' );
+
+/**
  * Sets up theme defaults and registers support for various WordPress features.
  */
 function gia_theme_support() {
