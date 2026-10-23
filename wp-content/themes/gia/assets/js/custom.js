@@ -323,6 +323,107 @@ document.addEventListener("click", function (event) {
     });
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+  document
+    .querySelectorAll(".gia-company-news-slider")
+    .forEach(function (slider) {
+      var slides = Array.prototype.slice.call(
+        slider.querySelectorAll(".gia-company-news-slider__slide"),
+      );
+      var counter = slider.querySelector(".gia-company-news-slider__counter");
+      var previous = slider.querySelector(
+        ".gia-company-news-slider__previous",
+      );
+      var next = slider.querySelector(".gia-company-news-slider__next");
+      var activeIndex = 0;
+      var timer = null;
+      var interval = Number(slider.dataset.autoplay) || 5000;
+      var reduceMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)",
+      ).matches;
+      var isHovered = false;
+      var hasFocus = false;
+
+      if (slides.length < 2) {
+        return;
+      }
+
+      function showSlide(index) {
+        activeIndex = (index + slides.length) % slides.length;
+        slides.forEach(function (slide, slideIndex) {
+          var isActive = slideIndex === activeIndex;
+          slide.classList.toggle("is-active", isActive);
+          slide.hidden = !isActive;
+          slide.setAttribute("aria-hidden", String(!isActive));
+        });
+
+        if (counter) {
+          counter.textContent = String(activeIndex + 1) + "/" + slides.length;
+        }
+      }
+
+      function stopAutoplay() {
+        if (timer) {
+          window.clearInterval(timer);
+          timer = null;
+        }
+      }
+
+      function startAutoplay() {
+        stopAutoplay();
+
+        if (!reduceMotion && !document.hidden && !isHovered && !hasFocus) {
+          timer = window.setInterval(function () {
+            showSlide(activeIndex + 1);
+          }, interval);
+        }
+      }
+
+      if (previous) {
+        previous.addEventListener("click", function () {
+          showSlide(activeIndex - 1);
+          startAutoplay();
+        });
+      }
+
+      if (next) {
+        next.addEventListener("click", function () {
+          showSlide(activeIndex + 1);
+          startAutoplay();
+        });
+      }
+
+      slider.addEventListener("mouseenter", function () {
+        isHovered = true;
+        stopAutoplay();
+      });
+      slider.addEventListener("mouseleave", function () {
+        isHovered = false;
+        startAutoplay();
+      });
+      slider.addEventListener("focusin", function () {
+        hasFocus = true;
+        stopAutoplay();
+      });
+      slider.addEventListener("focusout", function (event) {
+        if (!slider.contains(event.relatedTarget)) {
+          hasFocus = false;
+          startAutoplay();
+        }
+      });
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden) {
+          stopAutoplay();
+        } else {
+          startAutoplay();
+        }
+      });
+
+      startAutoplay();
+    });
+});
+
 document.addEventListener("click", function (event) {
   var button = event.target.closest(".gia-other-insurance__load-more");
   if (!button || !window.giaOtherInsurance) {

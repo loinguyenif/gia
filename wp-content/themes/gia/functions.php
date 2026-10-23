@@ -1093,6 +1093,92 @@ function apat_searchform() {
 add_shortcode( 'apat_searchform', 'apat_searchform');
 
 
+function apat_company_news( $atts ) {
+    $atts = shortcode_atts(
+        array(
+            'slug' => 'company-news',
+        ),
+        $atts,
+        'apat_company_news'
+    );
+    $category = get_category_by_slug( sanitize_title( $atts['slug'] ) );
+
+    if ( ! ( $category instanceof WP_Term ) ) {
+        return '<p class="gia-company-news-slider__message" role="alert">'
+            . esc_html__( 'Company news category not found. Check the shortcode slug attribute.', 'gia' )
+            . '</p>';
+    }
+
+    $news_query = new WP_Query(
+        array(
+            'post_type'           => 'post',
+            'post_status'         => 'publish',
+            'posts_per_page'      => -1,
+            'cat'                 => $category->term_id,
+            'orderby'             => 'date',
+            'order'               => 'DESC',
+            'ignore_sticky_posts' => true,
+        )
+    );
+
+    if ( ! $news_query->have_posts() ) {
+        return '<p class="gia-company-news-slider__message">'
+            . esc_html__( 'No company news found.', 'gia' )
+            . '</p>';
+    }
+
+    $total  = (int) $news_query->post_count;
+    $slides = '';
+    $index  = 0;
+
+    while ( $news_query->have_posts() ) {
+        $news_query->the_post();
+        $post_id   = get_the_ID();
+        $image     = get_the_post_thumbnail_url( $post_id, 'full' );
+        $is_active = 0 === $index;
+
+        $slides .= '<article class="gia-company-news-slider__slide' . ( $is_active ? ' is-active' : '' ) . '"'
+            . ' aria-hidden="' . ( $is_active ? 'false' : 'true' ) . '"'
+            . ( $is_active ? '' : ' hidden' ) . '>';
+
+        if ( $image ) {
+            $slides .= '<img class="gia-company-news-slider__image" src="' . esc_url( $image ) . '" alt=""'
+                . ( $is_active ? ' fetchpriority="high"' : ' loading="lazy"' ) . '>';
+        }
+
+        $slides .= '<div class="gia-company-news-slider__content">'
+            . '<p class="gia-company-news-slider__eyebrow">' . esc_html__( 'News', 'gia' ) . '</p>'
+            . '<time class="gia-company-news-slider__date" datetime="' . esc_attr( get_the_date( DATE_W3C, $post_id ) ) . '">'
+            . esc_html( get_the_date( 'd/m', $post_id ) )
+            . '</time>'
+            . '<h2 class="gia-company-news-slider__title"><a href="' . esc_url( get_permalink( $post_id ) ) . '">'
+            . esc_html( get_the_title( $post_id ) )
+            . '</a></h2>'
+            . '</div></article>';
+        $index++;
+    }
+
+    wp_reset_postdata();
+
+    $output = '<section class="gia-company-news-slider" role="region" aria-roledescription="' . esc_attr__( 'carousel', 'gia' ) . '"'
+        . ' aria-label="' . esc_attr__( 'Company news', 'gia' ) . '" data-autoplay="5000">'
+        . '<div class="gia-company-news-slider__stage">' . $slides . '</div>';
+
+    if ( $total > 1 ) {
+        $output .= '<div class="gia-company-news-slider__controls">'
+            . '<button class="gia-company-news-slider__arrow gia-company-news-slider__previous" type="button" aria-label="' . esc_attr__( 'Previous news', 'gia' ) . '">'
+            . '<span aria-hidden="true">&#8592;</span></button>'
+            . '<span class="gia-company-news-slider__counter" aria-live="polite" aria-atomic="true" data-total="' . esc_attr( $total ) . '">1/' . esc_html( $total ) . '</span>'
+            . '<button class="gia-company-news-slider__arrow gia-company-news-slider__next" type="button" aria-label="' . esc_attr__( 'Next news', 'gia' ) . '">'
+            . '<span aria-hidden="true">&#8594;</span></button>'
+            . '</div>';
+    }
+
+    return $output . '</section>';
+}
+add_shortcode( 'apat_company_news', 'apat_company_news');
+
+
 function gia_other_insurance_category_id( $category ) {
     if ( is_numeric( $category ) ) {
         $term = get_term( absint( $category ), 'category' );
