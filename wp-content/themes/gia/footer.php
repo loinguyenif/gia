@@ -15,6 +15,7 @@
 		</footer><!-- #site-footer -->
 
 		<?php wp_footer(); ?>
+
 		<div class="copyright">
 			<div class="container">
 				<div class="row">
