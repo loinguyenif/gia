@@ -452,7 +452,7 @@ ul.black-dot > li {
 .gia-company-news-slider__stage {
   position: relative;
   width: 100%;
-  min-height: 300px;
+  min-height: 420px;
   overflow: hidden;
   background: #08090c;
 }
@@ -688,11 +688,11 @@ ul.black-dot > li {
 
 @media (max-width: 767px) {
   .gia-company-news-slider__stage {
-    height: 620px;
+    height: 420px;
     min-height: 0;
   }
   .gia-company-news-slider__content {
-    width: 90%;
+    width: 100%;
     padding: 38px 7% 100px;
   }
   .gia-company-news-slider__controls {
@@ -738,10 +738,10 @@ ul.black-dot > li {
 
 @media (max-width: 520px) {
   .gia-company-news-slider__stage {
-    height: 560px;
+    height: 320px;
   }
   .gia-company-news-slider__content {
-    width: 90%;
+    width: 100%;
     padding-top: 34px;
   }
   .gia-company-news-slider__date {
