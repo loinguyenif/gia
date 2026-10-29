@@ -99,19 +99,9 @@ function gia_register_styles() {
     $theme_version = wp_get_theme()->get( 'Version' );
     wp_enqueue_style( 'font-DINOT-css', THEME_URL . '/assets/webfonts/font-DINOT.css', array(), $theme_version );
     wp_enqueue_style( 'bootstrap-css', THEME_URL . '/assets/css/bootstrap.css', array(), $theme_version );
-    wp_enqueue_style( 'bootstrap-select-css', THEME_URL . '/assets/css/bootstrap-select.min.css', array(), $theme_version );
-    wp_enqueue_style( 'carousel-css', THEME_URL . '/assets/css/owl.carousel.css', array(), $theme_version );
     wp_enqueue_style( 'stylesheet-css', THEME_URL . '/assets/css/all.css', array(), $theme_version );
     wp_enqueue_style( 'style-css', get_stylesheet_uri(), array(), $theme_version );
-    wp_enqueue_style( 'responsive-css', THEME_URL . '/assets/css/responsive.css', array());
-    wp_enqueue_style( 'gia-header-css', THEME_URL . '/assets/css/gia-header.css', array(), $theme_version );
-    wp_enqueue_style( 'gia-footer-css', THEME_URL . '/assets/css/gia-footer.css', array( 'gia-header-css' ), $theme_version );
-    wp_enqueue_style( 'gia-search-css', THEME_URL . '/assets/css/gia-search.css', array( 'gia-header-css' ), $theme_version );
-    wp_enqueue_style( 'gia-faq-css', THEME_URL . '/assets/css/gia-faq.css', array( 'gia-header-css' ), $theme_version );
-
-    if ( is_page( 'contact-us' ) ) {
-        wp_enqueue_style( 'gia-contact-css', THEME_URL . '/assets/css/gia-contact.css', array( 'gia-header-css' ), $theme_version );
-    }
+    wp_enqueue_style( 'responsive-css', THEME_URL . '/assets/css/responsive.css', array( 'style-css' ), $theme_version );
 }
 add_action( 'wp_enqueue_scripts', 'gia_register_styles' );
 
@@ -580,8 +570,8 @@ function gia_enqueue_menu_icon_admin_assets( $hook_suffix ) {
 
     wp_enqueue_media();
     wp_enqueue_script(
-        'gia-menu-icon-admin',
-        THEME_URL . '/assets/js/gia-menu-icon-admin.js',
+        'custom-js',
+        THEME_URL . '/assets/js/custom.js',
         array( 'jquery', 'media-editor', 'media-views' ),
         wp_get_theme()->get( 'Version' ),
         true
@@ -749,12 +739,9 @@ function gia_register_scripts() {
 
     $theme_version = wp_get_theme()->get( 'Version' );
     wp_enqueue_script( 'jquery-js', THEME_URL . '/assets/js/jquery.min.js', array(), $theme_version );
-    wp_enqueue_script( 'popper.min-js', THEME_URL . '/assets/js/popper.min.js', array(), $theme_version );
-    wp_enqueue_script( 'bootstrap-js', THEME_URL . '/assets/js/bootstrap.min.js', array(), $theme_version );
-    wp_enqueue_script( 'select-js', THEME_URL . '/assets/js/bootstrap-select.min.js', array(), $theme_version );
-    wp_enqueue_script( 'matchHeight-js', THEME_URL . '/assets/js/jquery.matchHeight-min.js', array(), $theme_version );
-    wp_enqueue_script( 'carousel-js', THEME_URL . '/assets/js/owl.carousel.min.js', array(), $theme_version );
-    wp_enqueue_script( 'custom-js', THEME_URL . '/assets/js/custom.js', array());
+    wp_enqueue_script( 'popper-js', THEME_URL . '/assets/js/popper.min.js', array(), $theme_version );
+    wp_enqueue_script( 'bootstrap-js', THEME_URL . '/assets/js/bootstrap.min.js', array( 'jquery-js', 'popper-js' ), $theme_version );
+    wp_enqueue_script( 'custom-js', THEME_URL . '/assets/js/custom.js', array( 'jquery-js' ), $theme_version, true );
     wp_localize_script(
         'custom-js',
         'giaOtherInsurance',
@@ -766,7 +753,6 @@ function gia_register_scripts() {
             'annualReportsNonce'        => wp_create_nonce( 'gia_load_more_annual_reports' ),
         )
     );
-    wp_enqueue_script( 'gia-header-js', THEME_URL . '/assets/js/gia-header.js', array(), $theme_version, true );
     wp_script_add_data( 'async-js', 'async', true );
 
 }
