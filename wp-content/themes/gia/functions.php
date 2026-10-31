@@ -226,6 +226,25 @@ function gia_customize_register( $wp_customize ) {
             'type'        => 'url',
         )
     );
+
+    $wp_customize->add_setting(
+        'gia_header_contact_url',
+        array(
+            'default'           => home_url( '/contact-us/' ),
+            'sanitize_callback' => 'esc_url_raw',
+            'transport'         => 'refresh',
+        )
+    );
+
+    $wp_customize->add_control(
+        'gia_header_contact_url',
+        array(
+            'label'       => __( 'Header Contact Us URL', 'gia' ),
+            'description' => __( 'Destination for the Contact Us button in the orange audience bar.', 'gia' ),
+            'section'     => 'gia_theme_settings',
+            'type'        => 'url',
+        )
+    );
 }
 add_action( 'customize_register', 'gia_customize_register' );
 
@@ -1508,7 +1527,8 @@ function gia_render_management_committee_items( $query ) {
         $query->the_post();
 
         if ( 0 === $index % 5 ) {
-            $output .= '<div class="gia-committee__row">';
+            $row_item_count = min( 5, $query->post_count - $index );
+            $output .= '<div class="gia-committee__row gia-committee__row--count-' . absint( $row_item_count ) . '">';
         }
 
         $post_id = get_the_ID();

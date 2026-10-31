@@ -324,8 +324,6 @@ ul.black-dot > li {
   text-align: center;
 }
 
-
-
 .gia-company-news {
   margin: 50px auto;
 }
@@ -544,7 +542,6 @@ ul.black-dot > li {
   text-align: center;
 }
 
-
 .gia-annual-reports {
   margin: 50px auto;
 }
@@ -661,10 +658,6 @@ ul.black-dot > li {
   color: #b00020;
   text-align: center;
 }
-
-
-
-
 
 .gia-committee {
   width: 100%;
@@ -813,8 +806,6 @@ ul.black-dot > li {
   text-align: center;
 }
 
-
-
 .gia-committee--management .gia-committee__rows {
   gap: 40px;
 }
@@ -824,6 +815,60 @@ ul.black-dot > li {
   margin-left: auto;
   column-gap: 10px;
   row-gap: 24px;
+  grid-template-columns: repeat(10, minmax(0, 1fr));
+}
+.gia-committee--management .gia-committee__row > .gia-committee__item {
+  grid-column: span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-4
+  > .gia-committee__item:nth-child(1) {
+  grid-column: 2 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-4
+  > .gia-committee__item:nth-child(2) {
+  grid-column: 4 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-4
+  > .gia-committee__item:nth-child(3) {
+  grid-column: 6 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-4
+  > .gia-committee__item:nth-child(4) {
+  grid-column: 8 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-3
+  > .gia-committee__item:nth-child(1) {
+  grid-column: 3 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-3
+  > .gia-committee__item:nth-child(2) {
+  grid-column: 5 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-3
+  > .gia-committee__item:nth-child(3) {
+  grid-column: 7 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-2
+  > .gia-committee__item:nth-child(1) {
+  grid-column: 4 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-2
+  > .gia-committee__item:nth-child(2) {
+  grid-column: 6 / span 2;
+}
+.gia-committee--management
+  .gia-committee__row--count-1
+  > .gia-committee__item:nth-child(1) {
+  grid-column: 5 / span 2;
 }
 .gia-committee--management .gia-committee__image,
 .gia-committee--management .gia-committee__image-placeholder {
@@ -846,7 +891,7 @@ ul.black-dot > li {
   width: min(1172px, calc(100vw - 40px));
   max-width: none;
   min-height: 353px;
-  margin-top: 18px;
+  margin-top: 0;
   margin-left: 50%;
   padding: 44px 16px;
   box-sizing: border-box;
@@ -892,8 +937,6 @@ ul.black-dot > li {
   font-size: 16px;
   line-height: 1.5;
 }
-
-
 
 .gia-insurance-hero {
   width: 100%;
@@ -1086,8 +1129,6 @@ ul.black-dot > li {
   padding-top: 20px;
 }
 
-
-
 #member-directory .gia-committee__rows {
   gap: 40px;
 }
@@ -1157,8 +1198,6 @@ ul.black-dot > li {
 #member-directory .gia-committee__detail-title {
   margin-top: 10px;
 }
-
-
 
 .careers-items .e-default-div {
   position: relative;
@@ -1278,7 +1317,6 @@ ul.black-dot > li {
   outline: none;
 }
 
-
 /* ============================================================
    GIA Header Styles
    ============================================================ */
@@ -1310,7 +1348,10 @@ html {
 }
 
 .gia-header__audience-nav {
+  display: flex;
   min-height: 58px;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .gia-header__audience-menu {
@@ -1336,6 +1377,28 @@ html {
   color: #fff;
   font-size: 15px;
   text-decoration: none;
+}
+
+.gia-header__contact-link {
+  display: inline-flex;
+  min-height: 38px;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  padding: 0 18px;
+  border: 1px solid #fff;
+  background: #fff;
+  color: #d65f1d;
+  font-size: 15px;
+  font-weight: 700;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.gia-header__contact-link:hover,
+.gia-header__contact-link:focus-visible {
+  background: transparent;
+  color: #fff;
 }
 
 .gia-header__audience-menu li.is-active > a,
@@ -1585,8 +1648,6 @@ html {
   transform: translateY(8px);
   visibility: hidden;
 }
-
-
 
 .gia-nav-mega__inner {
   display: grid;
@@ -2476,9 +2537,13 @@ html {
   border-radius: 4px;
   background: #fff;
   color: #222;
-  font: 16px/1.5 "DINOT-Regular", sans-serif;
+  font:
+    16px/1.5 "DINOT-Regular",
+    sans-serif;
   box-sizing: border-box;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .elementor-807 .wpcf7 textarea {
@@ -2515,7 +2580,9 @@ html {
   font-family: "DINOT-Medium", sans-serif;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .elementor-807 .wpcf7 input[type="submit"]:hover,

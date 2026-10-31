@@ -30,6 +30,9 @@
 							);
 							?>
 						<?php endif; ?>
+						<a class="gia-header__contact-link" href="<?php echo esc_url( get_theme_mod( 'gia_header_contact_url', home_url( '/contact-us/' ) ) ); ?>">
+							<?php esc_html_e( 'Contact Us', 'gia' ); ?>
+						</a>
 					</nav>
 				</div>
 
